@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Invention of Morel vs. The Matrix</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00ff41;
+  --green-dim: #00cc34;
+  --green-dark: #007a1f;
+  --green-ghost: rgba(0,255,65,0.07);
+  --red: #ff0033;
+  --blue: #0066ff;
+  --black: #000;
+  --scanline: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body {
+  background:#000;
+  color:var(--green);
+  font-family:'Share Tech Mono',monospace;
+  overflow:hidden;
+  width:100vw;height:100vh;
+  cursor:none;
+}
+
+/* ── CUSTOM CURSOR ── */
+#cursor {
+  position:fixed;width:20px;height:20px;
+  border:1px solid var(--green);
+  border-radius:50%;pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width .1s,height .1s,border-color .1s;
+  mix-blend-mode:screen;
+}
+#cursor::after {
+  content:'';position:absolute;top:50%;left:50%;
+  width:4px;height:4px;background:var(--green);
+  border-radius:50%;transform:translate(-50%,-50%);
+}
+body:hover #cursor{opacity:1}
+
+/* ── MATRIX RAIN ── */
+#rain-canvas {
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;opacity:.18;pointer-events:none;
+}
+
+/* ── SCANLINE OVERLAY ── */
+#scanlines {
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:var(--scanline);
+  z-index:1;pointer-events:none;opacity:.4;
+  animation:scanMove 8s linear infinite;
+}
+@keyframes scanMove{from{background-position:0 0}to{background-position:0 100%}}
+
+/* ── GLITCH FLASH ── */
+#glitch-overlay {
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:2;pointer-events:none;
+  background:rgba(0,255,65,0);
+  animation:glitchPulse 7s infinite;
+}
+@keyframes glitchPulse{
+  0%,97%{background:rgba(0,255,65,0);clip-path:none}
+  97.5%{background:rgba(0,255,65,0.04);clip-path:inset(30% 0 50% 0)}
+  98%{background:rgba(255,0,51,0.03);clip-path:inset(60% 0 10% 0)}
+  99%{background:rgba(0,255,65,0);clip-path:none}
+}
+
+/* ── PRESENTATION SHELL ── */
+#pres {
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:3;display:flex;flex-direction:column;
+}
+
+/* ── TOPBAR ── */
+#topbar {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 24px;border-bottom:1px solid rgba(0,255,65,.2);
+  background:rgba(0,0,0,.85);backdrop-filter:blur(4px);
+  flex-shrink:0;
+}
+#topbar .logo {
+  font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;
+  color:var(--green);opacity:.7;
+}
+#progress-bar-wrap {
+  flex:1;margin:0 20px;height:2px;
+  background:rgba(0,255,65,.1);border-radius:2px;overflow:hidden;
+}
+#progress-bar {
+  height:100%;background:var(--green);
+  transition:width .4s ease;
+  box-shadow:0 0 8px var(--green);
+}
+#topbar .slide-counter {
+  font-size:11px;color:rgba(0,255,65,.5);letter-spacing:2px;min-width:60px;text-align:right;
+}
+
+/* ── MAIN SLIDE AREA ── */
+#slide-area {
+  flex:1;overflow:hidden;position:relative;
+}
+
+/* ── SLIDE ── */
+.slide {
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:32px 48px;text-align:center;
+  opacity:0;pointer-events:none;
+  transition:none;
+}
+.slide.active {opacity:1;pointer-events:all}
+
+/* Transition classes */
+.slide.enter-right {animation:enterRight .5s cubic-bezier(.23,1,.32,1) forwards}
+.slide.enter-left  {animation:enterLeft  .5s cubic-bezier(.23,1,.32,1) forwards}
+.slide.exit-right  {animation:exitRight  .4s ease-in forwards}
+.slide.exit-left   {animation:exitLeft   .4s ease-in forwards}
+
+@keyframes enterRight{from{opacity:0;transform:translateX(60px) skewX(-2deg)}to{opacity:1;transform:none}}
+@keyframes enterLeft {from{opacity:0;transform:translateX(-60px) skewX(2deg)} to{opacity:1;transform:none}}
+@keyframes exitRight {from{opacity:1;transform:none}to{opacity:0;transform:translateX(-40px)}}
+@keyframes exitLeft  {from{opacity:1;transform:none}to{opacity:0;transform:translateX(40px)}}
+
+/* ── TYPOGRAPHY ── */
+.section-badge {
+  font-size:9px;letter-spacing:5px;color:rgba(0,255,65,.45);
+  text-transform:uppercase;margin-bottom:14px;
+  border:1px solid rgba(0,255,65,.15);padding:4px 14px;display:inline-block;
+}
+.slide-title {
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(20px,3.5vw,40px);
+  font-weight:900;color:var(--green);
+  line-height:1.15;margin-bottom:16px;
+  text-shadow:0 0 30px rgba(0,255,65,.5),0 0 60px rgba(0,255,65,.2);
+  animation:titlePulse 4s ease-in-out infinite;
+}
+@keyframes titlePulse{0%,100%{text-shadow:0 0 30px rgba(0,255,65,.5),0 0 60px rgba(0,255,65,.2)}50%{text-shadow:0 0 50px rgba(0,255,65,.8),0 0 100px rgba(0,255,65,.3)}}
+
+.divider {
+  width:80px;height:1px;margin:14px auto;
+  background:linear-gradient(90deg,transparent,var(--green),transparent);
+}
+
+.body-text {
+  font-size:clamp(13px,1.6vw,16px);color:var(--green-dim);
+  line-height:1.85;max-width:700px;
+}
+.body-text b, .body-text strong {color:var(--green);font-weight:400}
+.body-text em {color:rgba(0,255,65,.6);font-style:normal}
+
+/* ── PERSON LABEL ── */
+.person-label {
+  position:absolute;top:14px;left:20px;
+  font-size:9px;letter-spacing:3px;color:rgba(0,255,65,.3);
+  text-transform:uppercase;
+}
+
+/* ── COMPARE GRID ── */
+.compare-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  width:100%;max-width:720px;margin-top:16px;
+}
+.cbox {
+  border:1px solid rgba(0,255,65,.2);padding:20px;
+  border-radius:2px;text-align:left;
+  background:rgba(0,255,65,.03);
+  transition:border-color .3s,background .3s;
+  position:relative;overflow:hidden;
+}
+.cbox::before {
+  content:'';position:absolute;top:0;left:0;width:3px;height:100%;
+  background:var(--green);opacity:.4;
+}
+.cbox:hover{border-color:rgba(0,255,65,.5);background:rgba(0,255,65,.06)}
+.cbox h4{color:var(--green);font-size:12px;letter-spacing:2px;margin-bottom:10px;font-family:'Orbitron',sans-serif;font-size:11px}
+.cbox p{color:var(--green-dim);font-size:12px;line-height:1.7}
+
+/* ── PILL BUTTONS ── */
+.pill-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+.pill{
+  padding:10px 24px;border-radius:3px;font-family:'Share Tech Mono',monospace;
+  font-size:13px;letter-spacing:2px;border:1px solid;cursor:default;
+  transition:all .3s;
+}
+.pill.green{border-color:rgba(0,255,65,.4);color:var(--green);background:rgba(0,255,65,.05)}
+.pill.red  {border-color:rgba(255,0,51,.5);color:#ff0033;background:rgba(255,0,51,.05);text-shadow:0 0 10px rgba(255,0,51,.4)}
+.pill.blue {border-color:rgba(0,102,255,.5);color:#0099ff;background:rgba(0,102,255,.05);text-shadow:0 0 10px rgba(0,102,255,.4)}
+
+/* ── VIDEO SLIDE ── */
+.video-frame {
+  width:100%;max-width:640px;
+  border:1px solid rgba(0,255,65,.3);
+  position:relative;overflow:hidden;
+  background:#000;border-radius:2px;
+  box-shadow:0 0 30px rgba(0,255,65,.1);
+}
+.video-frame iframe{display:block;width:100%;aspect-ratio:16/9;border:none}
+.video-caption{font-size:11px;color:rgba(0,255,65,.4);letter-spacing:2px;margin-top:10px}
+
+/* ── TERMINAL SLIDE ── */
+.terminal {
+  width:100%;max-width:640px;text-align:left;
+  background:rgba(0,10,0,.9);border:1px solid rgba(0,255,65,.25);
+  border-radius:4px;overflow:hidden;
+  box-shadow:0 0 40px rgba(0,255,65,.08);
+}
+.terminal-bar{
+  background:rgba(0,255,65,.08);padding:8px 14px;
+  display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,255,65,.15);
+}
+.tbar-dot{width:10px;height:10px;border-radius:50%}
+.terminal-body{padding:20px 24px;font-size:13px;line-height:2}
+.t-prompt{color:rgba(0,255,65,.4)}
+.t-cmd{color:var(--green)}
+.t-out{color:rgba(0,255,65,.6)}
+.t-cursor{display:inline-block;width:8px;height:14px;background:var(--green);animation:blink .8s step-end infinite;vertical-align:middle;margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── QUOTE SLIDE ── */
+.big-quote {
+  font-family:'VT323',monospace;font-size:clamp(22px,3.5vw,42px);
+  color:var(--green);line-height:1.4;max-width:700px;
+  border-left:3px solid var(--green);padding-left:24px;text-align:left;
+  text-shadow:0 0 20px rgba(0,255,65,.3);
+}
+.big-quote cite{display:block;font-size:14px;color:rgba(0,255,65,.4);margin-top:12px;font-style:normal;letter-spacing:2px}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:640px;margin-top:16px}
+.stat-card{
+  border:1px solid rgba(0,255,65,.2);padding:20px 16px;text-align:center;
+  background:rgba(0,255,65,.03);
+  transition:all .3s;
+}
+.stat-card:hover{border-color:rgba(0,255,65,.5);transform:translateY(-3px)}
+.stat-num{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;color:var(--green);display:block;margin-bottom:6px}
+.stat-label{font-size:10px;letter-spacing:2px;color:rgba(0,255,65,.45);text-transform:uppercase}
+
+/* ── TIMELINE ── */
+.timeline{width:100%;max-width:640px;text-align:left;margin-top:10px}
+.tl-item{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start}
+.tl-dot{width:10px;height:10px;background:var(--green);border-radius:50%;flex-shrink:0;margin-top:5px;box-shadow:0 0 8px var(--green)}
+.tl-line{width:1px;background:rgba(0,255,65,.2);flex-shrink:0;margin:0 4.5px;display:block;height:100%}
+.tl-content h5{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--green);margin-bottom:4px;letter-spacing:1px}
+.tl-content p{font-size:12px;color:var(--green-dim);line-height:1.6}
+
+/* ── BOTTOM NAV ── */
+#nav {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 24px;border-top:1px solid rgba(0,255,65,.15);
+  background:rgba(0,0,0,.9);backdrop-filter:blur(4px);flex-shrink:0;
+}
+.nav-btn {
+  background:transparent;border:1px solid rgba(0,255,65,.3);
+  color:var(--green);font-family:'Share Tech Mono',monospace;
+  font-size:11px;padding:9px 22px;cursor:pointer;letter-spacing:3px;
+  border-radius:2px;transition:all .2s;
+  text-transform:uppercase;
+}
+.nav-btn:hover{background:rgba(0,255,65,.1);border-color:var(--green);box-shadow:0 0 14px rgba(0,255,65,.2)}
+.nav-btn:disabled{opacity:.15;cursor:default;box-shadow:none}
+
+#dots-wrap{display:flex;gap:5px;flex-wrap:wrap;max-width:400px;justify-content:center}
+.dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(0,255,65,.12);border:1px solid rgba(0,255,65,.25);
+  cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.dot.active{background:var(--green);box-shadow:0 0 8px var(--green)}
+.dot:hover{background:rgba(0,255,65,.4)}
+
+.slide-person-nav {
+  font-size:9px;letter-spacing:2px;color:rgba(0,255,65,.3);text-align:center;min-width:80px;
+}
+
+/* ── SECTION INTRO SLIDES ── */
+.section-intro .slide-title{font-size:clamp(32px,6vw,72px);opacity:0;animation:sectionReveal 1s .2s forwards}
+.section-intro .section-badge{opacity:0;animation:sectionReveal 1s .5s forwards}
+@keyframes sectionReveal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+/* ── GLITCH TEXT ── */
+.glitch {
+  position:relative;display:inline-block;
+}
+.glitch::before,.glitch::after {
+  content:attr(data-text);position:absolute;top:0;left:0;width:100%;
+}
+.glitch::before{color:#ff003366;animation:glitchA 3s infinite;clip-path:polygon(0 30%,100% 30%,100% 50%,0 50%)}
+.glitch::after {color:#0099ff66;animation:glitchB 3s infinite;clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%)}
+@keyframes glitchA{0%,90%,100%{transform:none}91%{transform:translate(-3px,-2px)}93%{transform:translate(3px,1px)}95%{transform:none}97%{transform:translate(-2px,2px)}99%{transform:none}}
+@keyframes glitchB{0%,90%,100%{transform:none}92%{transform:translate(3px,-1px)}94%{transform:translate(-2px,2px)}96%{transform:none}98%{transform:translate(2px,-1px)}}
+
+/* ── DECODE ANIMATION ── */
+@keyframes decode{
+  0%{content:'▓▒░█▓▒'}
+  20%{content:'R▒░█▓▒'}
+  40%{content:'RE░█▓▒'}
+  60%{content:'REA█▓▒'}
+  80%{content:'REAL▓▒'}
+  100%{content:'REALITY'}
+}
+
+/* ── PILL EASTER EGG OVERLAY ── */
+#pill-overlay {
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:1000;background:#000;flex-direction:column;align-items:center;justify-content:center;
+  font-family:'Share Tech Mono',monospace;
+}
+#pill-overlay.show{display:flex}
+
+.pill-scene {
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  animation:pillFadeIn 1.5s ease forwards;
+}
+@keyframes pillFadeIn{from{opacity:0}to{opacity:1}}
+
+.pill-title {
+  font-family:'Orbitron',sans-serif;font-size:clamp(14px,2.5vw,22px);
+  color:var(--green);letter-spacing:4px;margin-bottom:40px;
+  text-shadow:0 0 20px var(--green);
+}
+.pill-choices {
+  display:flex;gap:60px;align-items:center;justify-content:center;margin-bottom:50px;
+  flex-wrap:wrap;
+}
+.pill-btn {
+  width:160px;height:70px;border-radius:35px;border:none;
+  font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:3px;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .2s,box-shadow .3s;
+  text-transform:uppercase;font-weight:700;
+}
+.pill-btn.red-pill{
+  background:radial-gradient(ellipse at 40% 35%, #ff6666, #cc0022, #660011);
+  color:#fff;box-shadow:0 0 30px rgba(255,0,51,.5);
+}
+.pill-btn.blue-pill{
+  background:radial-gradient(ellipse at 40% 35%, #66aaff, #0044cc, #001166);
+  color:#fff;box-shadow:0 0 30px rgba(0,102,255,.5);
+}
+.pill-btn:hover{transform:scale(1.08) translateY(-3px)}
+.pill-btn.red-pill:hover{box-shadow:0 0 60px rgba(255,0,51,.8)}
+.pill-btn.blue-pill:hover{box-shadow:0 0 60px rgba(0,102,255,.8)}
+
+.pill-btn::after{
+  content:'';position:absolute;top:10px;left:20px;
+  width:30px;height:12px;background:rgba(255,255,255,.3);
+  border-radius:10px;transform:rotate(-20deg);pointer-events:none;
+}
+
+/* ── UNCANNY FACE ── */
+#face-container {
+  display:none;flex-direction:column;align-items:center;gap:20px;
+  animation:faceReveal 2s ease forwards;
+}
+@keyframes faceReveal{
+  0%{opacity:0;transform:scale(1.3)}
+  30%{opacity:1;transform:scale(0.98)}
+  60%{transform:scale(1.02)}
+  100%{opacity:1;transform:scale(1)}
+}
+
+#uncanny-face {
+  width:220px;height:220px;position:relative;
+}
+
+.face-svg {
+  width:100%;height:100%;
+  filter:drop-shadow(0 0 20px rgba(255,0,51,.6));
+  animation:facePulse 2s ease-in-out infinite,faceGlitch 6s infinite;
+}
+@keyframes facePulse{0%,100%{filter:drop-shadow(0 0 20px rgba(255,0,51,.6))}50%{filter:drop-shadow(0 0 40px rgba(255,0,51,.9))}}
+@keyframes faceGlitch{
+  0%,85%,100%{transform:none}
+  86%{transform:translate(3px,-2px) scaleX(1.02)}
+  87%{transform:translate(-3px,1px) scaleX(0.98)}
+  88%{transform:none}
+  95%{transform:translate(0,2px)}
+  96%{transform:none}
+}
+
+.eye-left, .eye-right {animation:eyeBlink 4s ease-in-out infinite}
+@keyframes eyeBlink{0%,45%,55%,100%{transform:scaleY(1) translateY(0)}47%,53%{transform:scaleY(0.05) translateY(3px)}}
+
+.pupil-left,.pupil-right{animation:eyeMove 5s ease-in-out infinite}
+@keyframes eyeMove{
+  0%,100%{transform:translate(0,0)}
+  20%{transform:translate(4px,-2px)}
+  40%{transform:translate(-3px,3px)}
+  60%{transform:translate(5px,1px)}
+  80%{transform:translate(-2px,-3px)}
+}
+
+.mouth-path{animation:mouthMove 3s ease-in-out infinite}
+@keyframes mouthMove{0%,100%{d:path('M 75 148 Q 110 168 145 148')}40%{d:path('M 75 155 Q 110 140 145 155')}70%{d:path('M 72 150 Q 110 178 148 150')}}
+
+#ai-speech {
+  max-width:320px;text-align:center;
+  border:1px solid rgba(255,0,51,.3);padding:16px 20px;
+  background:rgba(255,0,0,.05);border-radius:2px;
+  font-size:13px;color:#ff6666;line-height:1.7;
+  animation:speechGlitch 8s infinite;
+}
+@keyframes speechGlitch{
+  0%,90%,100%{filter:none}
+  91%{filter:hue-rotate(90deg) brightness(1.3)}
+  92%{filter:none}
+}
+
+.face-title{
+  font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:4px;
+  color:rgba(255,0,51,.7);text-transform:uppercase;
+  animation:flicker 3s infinite;
+}
+@keyframes flicker{0%,100%{opacity:.7}45%{opacity:.9}46%{opacity:.2}47%{opacity:.8}90%{opacity:.7}91%{opacity:.15}92%{opacity:.7}}
+
+#pill-back {
+  position:absolute;bottom:30px;
+  background:transparent;border:1px solid rgba(0,255,65,.2);
+  color:rgba(0,255,65,.4);font-family:'Share Tech Mono',monospace;
+  font-size:10px;padding:8px 20px;cursor:pointer;letter-spacing:3px;
+  border-radius:2px;transition:all .2s;
+}
+#pill-back:hover{border-color:var(--green);color:var(--green)}
+
+#pill-close{
+  position:absolute;top:20px;right:20px;
+  background:transparent;border:none;
+  color:rgba(0,255,65,.3);font-family:'Share Tech Mono',monospace;
+  font-size:20px;cursor:pointer;transition:color .2s;
+}
+#pill-close:hover{color:var(--green)}
+
+/* ── PILL TRIGGER BTN ── */
+#pill-trigger {
+  position:fixed;bottom:80px;right:24px;z-index:10;
+  background:transparent;border:1px solid rgba(255,0,51,.3);
+  color:rgba(255,0,51,.5);font-family:'Share Tech Mono',monospace;
+  font-size:9px;padding:7px 14px;cursor:pointer;letter-spacing:2px;
+  border-radius:2px;transition:all .3s;
+  animation:triggerPulse 4s ease-in-out infinite;
+}
+#pill-trigger:hover{border-color:rgba(255,0,51,.8);color:#ff0033;background:rgba(255,0,51,.05)}
+@keyframes triggerPulse{0%,100%{opacity:.4}50%{opacity:.9}}
+
+/* ── Q&A BOXES ── */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:720px;margin-top:12px}
+.qa-item{
+  border:1px solid rgba(0,255,65,.15);padding:16px;border-radius:2px;
+  text-align:left;background:rgba(0,255,65,.02);
+  transition:all .3s;cursor:default;
+}
+.qa-item:hover{border-color:rgba(0,255,65,.4);background:rgba(0,255,65,.05);transform:translateX(4px)}
+.qa-item p{font-size:12px;color:var(--green-dim);line-height:1.7}
+.qa-num{font-family:'Orbitron',sans-serif;font-size:10px;color:rgba(0,255,65,.3);margin-bottom:6px;letter-spacing:2px}
+
+/* ── THANK YOU SLIDE ── */
+.ty-glyph{
+  font-family:'VT323',monospace;font-size:clamp(60px,12vw,120px);
+  color:var(--green);line-height:1;
+  text-shadow:0 0 60px rgba(0,255,65,.4);
+  animation:tyPulse 3s ease-in-out infinite;
+}
+@keyframes tyPulse{0%,100%{text-shadow:0 0 60px rgba(0,255,65,.4)}50%{text-shadow:0 0 100px rgba(0,255,65,.7),0 0 160px rgba(0,255,65,.3)}}
+
+/* ── WIPE BG ── */
+.bg-grid-slide {
+  background-image:
+    linear-gradient(rgba(0,255,65,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,65,.03) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+
+/* AI Speech messages */
+.ai-msgs{display:none}
+
+/* Responsive */
+@media(max-width:600px){
+  .compare-grid,.stats-grid,.qa-grid{grid-template-columns:1fr}
+  .pill-choices{gap:30px}
+  #pres{font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<canvas id="rain-canvas"></canvas>
+<div id="scanlines"></div>
+<div id="glitch-overlay"></div>
+
+<!-- PILL EASTER EGG OVERLAY -->
+<div id="pill-overlay">
+  <button id="pill-close" onclick="closePill()">✕</button>
+
+  <div id="pill-choice-scene" class="pill-scene">
+    <div class="pill-title glitch" data-text="CHOOSE WISELY">CHOOSE WISELY</div>
+    <p style="font-size:12px;color:rgba(0,255,65,.4);letter-spacing:2px;margin-bottom:36px">
+      THIS CHOICE CANNOT BE UNDONE
+    </p>
+    <div class="pill-choices">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+        <button class="pill-btn red-pill" onclick="choosePill('red')">RED PILL</button>
+        <span style="font-size:10px;color:rgba(255,0,51,.5);letter-spacing:2px">TRUTH</span>
+      </div>
+      <div style="font-family:Orbitron,sans-serif;font-size:18px;color:rgba(0,255,65,.3);">VS</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+        <button class="pill-btn blue-pill" onclick="choosePill('blue')">BLUE PILL</button>
+        <span style="font-size:10px;color:rgba(0,102,255,.5);letter-spacing:2px">BLISS</span>
+      </div>
+    </div>
+    <p style="font-size:11px;color:rgba(0,255,65,.2);letter-spacing:1px;max-width:360px;text-align:center">
+      "You take the red pill — you stay in Wonderland, and I show you how deep the rabbit hole goes."
+    </p>
+  </div>
+
+  <div id="face-container">
+    <div class="face-title" id="face-label">SYSTEM ENTITY — DESIGNATION: UNKNOWN</div>
+    <div id="uncanny-face">
+      <svg class="face-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="skinGrad" cx="45%" cy="35%">
+            <stop offset="0%" stop-color="#2a1a1a"/>
+            <stop offset="100%" stop-color="#0d0505"/>
+          </radialGradient>
+          <radialGradient id="eyeGrad" cx="40%" cy="35%">
+            <stop offset="0%" stop-color="#330000"/>
+            <stop offset="60%" stop-color="#110000"/>
+            <stop offset="100%" stop-color="#000"/>
+          </radialGradient>
+          <filter id="faceBlur"><feGaussianBlur stdDeviation=".4"/></filter>
+          <filter id="glowRed">
+            <feGaussianBlur stdDeviation="3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Head shape — slightly asymmetric for uncanny effect -->
+        <ellipse cx="110" cy="112" rx="78" ry="90" fill="url(#skinGrad)" stroke="#1a0000" stroke-width="1"/>
+        <!-- Subtle facial imperfection lines -->
+        <path d="M 98 85 Q 102 82 99 90" stroke="#1f0000" stroke-width="1.2" fill="none" opacity=".6"/>
+        <path d="M 125 88 Q 121 84 123 93" stroke="#1f0000" stroke-width="1.2" fill="none" opacity=".5"/>
+        <!-- Forehead vein -->
+        <path d="M 100 70 Q 108 65 115 72 Q 118 68 125 70" stroke="#2a0a0a" stroke-width=".8" fill="none" opacity=".7"/>
+
+        <!-- Left eye socket -->
+        <g class="eye-left" transform-origin="83 108">
+          <ellipse cx="83" cy="108" rx="22" ry="16" fill="#0a0000" opacity=".9"/>
+          <ellipse cx="83" cy="108" rx="16" ry="12" fill="url(#eyeGrad)"/>
+          <!-- Iris — too wide, slightly off-center -->
+          <ellipse cx="85" cy="107" rx="9" ry="10" fill="#2b0000"/>
+          <ellipse cx="85" cy="107" rx="7" ry="8" fill="#1a0000"/>
+          <g class="pupil-left" transform-origin="85 107">
+            <!-- Pupil — vertical slit, wrong shape -->
+            <ellipse cx="85" cy="107" rx="2.5" ry="6" fill="#000"/>
+            <circle cx="83" cy="104" r="2" fill="rgba(255,0,0,.15)"/>
+          </g>
+          <ellipse cx="83" cy="104" rx="4" ry="2.5" fill="rgba(255,255,255,.04)"/>
+        </g>
+        <!-- Left eyelid -->
+        <path d="M 61 106 Q 83 93 105 107" stroke="#1a0505" stroke-width="1.5" fill="none"/>
+        <path d="M 61 110 Q 83 120 105 111" stroke="#1a0505" stroke-width="1.2" fill="none"/>
+
+        <!-- Right eye socket — slightly higher (asymmetric) -->
+        <g class="eye-right" transform-origin="137 105">
+          <ellipse cx="137" cy="105" rx="22" ry="16" fill="#0a0000" opacity=".9"/>
+          <ellipse cx="137" cy="105" rx="16" ry="12" fill="url(#eyeGrad)"/>
+          <ellipse cx="135" cy="104" rx="9" ry="10" fill="#2b0000"/>
+          <ellipse cx="135" cy="104" rx="7" ry="8" fill="#1a0000"/>
+          <g class="pupil-right" transform-origin="135 104">
+            <ellipse cx="135" cy="104" rx="2.5" ry="6" fill="#000"/>
+            <circle cx="133" cy="101" r="2" fill="rgba(255,0,0,.15)"/>
+          </g>
+          <ellipse cx="137" cy="101" rx="4" ry="2.5" fill="rgba(255,255,255,.04)"/>
+        </g>
+        <path d="M 115 103 Q 137 90 159 104" stroke="#1a0505" stroke-width="1.5" fill="none"/>
+        <path d="M 115 107 Q 137 117 159 108" stroke="#1a0505" stroke-width="1.2" fill="none"/>
+
+        <!-- Nose — too narrow, long -->
+        <path d="M 110 118 L 106 142 Q 110 148 114 142 L 110 118" stroke="#0f0000" stroke-width="1" fill="#110000" opacity=".8"/>
+        <ellipse cx="104" cy="143" rx="5" ry="3" fill="#0d0000" opacity=".6"/>
+        <ellipse cx="116" cy="143" rx="5" ry="3" fill="#0d0000" opacity=".6"/>
+
+        <!-- Mouth — uncanny smile, too wide -->
+        <g class="mouth-path">
+          <path d="M 75 152 Q 110 170 145 152" stroke="#0a0000" stroke-width="2" fill="none" id="mouth-curve"/>
+          <!-- Teeth — slightly too many, slightly wrong spacing -->
+          <rect x="87" y="153" width="8" height="10" rx="1" fill="#ddd" opacity=".7" transform="rotate(-2,91,158)"/>
+          <rect x="97" y="152" width="8" height="11" rx="1" fill="#e0e0e0" opacity=".8"/>
+          <rect x="107" y="152" width="8" height="11" rx="1" fill="#dedede" opacity=".8"/>
+          <rect x="117" y="153" width="8" height="10" rx="1" fill="#ddd" opacity=".7" transform="rotate(2,121,158)"/>
+          <!-- Tiny extra tooth -->
+          <rect x="104" y="152" width="3" height="7" rx="1" fill="#ccc" opacity=".4"/>
+          <path d="M 87 163 Q 110 168 133 163" stroke="#0a0000" stroke-width="1.5" fill="#0a0000" opacity=".5"/>
+        </g>
+
+        <!-- Skin texture — subtle bumps -->
+        <circle cx="95" cy="95" r="1" fill="rgba(30,5,5,.5)"/>
+        <circle cx="128" cy="92" r="1.2" fill="rgba(30,5,5,.4)"/>
+        <circle cx="140" cy="130" r=".8" fill="rgba(30,5,5,.5)"/>
+        <circle cx="80" cy="128" r="1" fill="rgba(30,5,5,.4)"/>
+        <!-- Cheek vein/shadow -->
+        <path d="M 55 115 Q 68 125 75 140" stroke="#1a0000" stroke-width="1" fill="none" opacity=".4"/>
+
+        <!-- Hair — uncanny, too uniform -->
+        <path d="M 33 95 Q 40 30 110 22 Q 180 30 187 95 Q 170 48 110 45 Q 50 48 33 95Z" fill="#050202"/>
+        <!-- Individual hair strands — too perfect -->
+        <path d="M 60 55 Q 65 40 70 55" stroke="#0a0303" stroke-width=".8" fill="none"/>
+        <path d="M 80 42 Q 85 28 90 43" stroke="#0a0303" stroke-width=".8" fill="none"/>
+        <path d="M 110 38 Q 112 22 114 38" stroke="#0a0303" stroke-width=".8" fill="none"/>
+        <path d="M 135 43 Q 140 28 143 44" stroke="#0a0303" stroke-width=".8" fill="none"/>
+        <path d="M 152 55 Q 156 40 160 55" stroke="#0a0303" stroke-width=".8" fill="none"/>
+
+        <!-- Red glow eyes — the "off" factor -->
+        <ellipse cx="85" cy="107" rx="5" ry="5" fill="rgba(180,0,0,.12)" filter="url(#glowRed)"/>
+        <ellipse cx="135" cy="104" rx="5" ry="5" fill="rgba(180,0,0,.12)" filter="url(#glowRed)"/>
+
+        <!-- Forehead data-stream artifact -->
+        <text x="95" y="35" font-size="5" fill="rgba(255,0,0,.15)" font-family="monospace">01001000 01001001</text>
+      </svg>
+    </div>
+
+    <div id="ai-speech" style="font-size:12px;color:#cc3333;max-width:340px;text-align:center;border:1px solid rgba(255,0,51,.2);padding:16px;background:rgba(255,0,0,.03)">
+      <span id="speech-text"></span><span class="t-cursor" style="background:#cc3333"></span>
+    </div>
+
+    <div class="face-title" style="margin-top:10px;font-size:9px;animation-delay:.5s" id="face-sublabel">
+      NEURAL PATTERN RECOGNISED · REALITY INDEX: ERROR
+    </div>
+    <button id="pill-back" onclick="resetPill()">◀ MAKE ANOTHER CHOICE</button>
+  </div>
+</div>
+
+<button id="pill-trigger" onclick="openPill()">▸ CHOOSE YOUR REALITY</button>
+
+<!-- MAIN PRESENTATION -->
+<div id="pres">
+  <div id="topbar">
+    <div class="logo">THE INVENTION OF MOREL vs. THE MATRIX</div>
+    <div id="progress-bar-wrap"><div id="progress-bar" style="width:3.4%"></div></div>
+    <div class="slide-counter" id="counter">01 / 29</div>
+  </div>
+  <div id="slide-area" id="slides"></div>
+  <div id="nav">
+    <button class="nav-btn" id="prev-btn" onclick="go(-1)" disabled>◀ PREV</button>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+      <div id="dots-wrap"></div>
+      <div class="slide-person-nav" id="person-nav"></div>
+    </div>
+    <button class="nav-btn" id="next-btn" onclick="go(1)">NEXT ▶</button>
+  </div>
+</div>
+
+<script>
+// ── CURSOR ──
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+
+// ── MATRIX RAIN ──
+(function(){
+  const canvas = document.getElementById('rain-canvas');
+  const ctx = canvas.getContext('2d');
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZｦｱｲｳｴｵｶｷｸｹｺ';
+  let cols, drops;
+  function init(){
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    cols  = Math.floor(canvas.width / 14);
+    drops = Array(cols).fill(1).map(() => Math.random() * -50);
+  }
+  init();
+  window.addEventListener('resize', init);
+  setInterval(() => {
+    ctx.fillStyle = 'rgba(0,0,0,0.055)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00ff41';
+    ctx.font = '13px monospace';
+    drops.forEach((y, i) => {
+      const ch = chars[Math.floor(Math.random() * chars.length)];
+      ctx.globalAlpha = Math.random() * 0.5 + 0.3;
+      ctx.fillText(ch, i * 14, y * 14);
+      ctx.globalAlpha = 1;
+      if (y * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i] += 0.7;
+    });
+  }, 35);
+})();
+
+// ── SLIDES DATA ──
+const slides = [
+  // 1 – INTRO
+  { section:'Introduction', person:'Person 1', type:'intro',
+    html:`
+    <div class="section-badge">Introduction · Slide 01</div>
+    <div class="slide-title"><span class="glitch" data-text="REALITY vs SIMULATION">REALITY vs SIMULATION</span></div>
+    <div class="divider"></div>
+    <div class="body-text">
+      <b>The Invention of Morel</b> (1940) &nbsp;·&nbsp; <b>The Matrix</b> (1999)<br><br>
+      Separated by six decades — united by one obsession:<br>
+      <em>What separates real experience from a perfect copy?</em>
+    </div>
+    <div class="pill-row">
+      <div class="pill green">ILLUSION</div>
+      <div class="pill green">IDENTITY</div>
+      <div class="pill green">TECHNOLOGY</div>
+    </div>`
+  },
+
+  // 2 – OPENING STATEMENT
+  { section:'Introduction', person:'Person 1', type:'quote',
+    html:`
+    <div class="section-badge">Opening Statement · Slide 02</div>
+    <div class="big-quote">
+      "Reality is based on perception.<br>Perception can be manipulated."
+      <cite>— CENTRAL THESIS</cite>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text" style="text-align:left;max-width:520px">
+      If our senses can be fooled completely — and technology can manufacture<br>
+      sensation indistinguishable from the real — does <b>objective reality</b> have<br>
+      any meaning left?
+    </div>`
+  },
+
+  // 3 – MOREL INTRO
+  { section:'The Invention of Morel', person:'Person 1', type:'bg-grid',
+    html:`
+    <div class="section-badge">The Invention of Morel · Slide 03</div>
+    <div class="slide-title">The Invention of Morel</div>
+    <div class="divider"></div>
+    <div class="body-text">
+      A novella by <b>Adolfo Bioy Casares</b> — published <b>1940</b>, Buenos Aires.<br><br>
+      A fugitive hides on a deserted island. He encounters a group of people<br>
+      living in an uncanny loop — eating, dancing, laughing — oblivious to him.<br><br>
+      <em>The question is not just who they are — but what they are.</em>
+    </div>`
+  },
+
+  // 4 – AUTHOR
+  { section:'The Invention of Morel', person:'Person 1', type:'terminal',
+    html:`
+    <div class="section-badge">Author · Slide 04</div>
+    <div class="slide-title">Adolfo Bioy Casares</div>
+    <div class="divider"></div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="tbar-dot" style="background:#ff5f57"></div>
+        <div class="tbar-dot" style="background:#ffbd2e"></div>
+        <div class="tbar-dot" style="background:#28ca41"></div>
+        <span style="font-size:10px;color:rgba(0,255,65,.3);margin-left:8px">author.exe</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">root@morel:~$ </span><span class="t-cmd">query --author bioy_casares</span></div>
+        <div class="t-out">NAME: Adolfo Bioy Casares</div>
+        <div class="t-out">BORN: Buenos Aires, 1914 · DIED: 1999</div>
+        <div class="t-out">GENRE: Speculative fiction · Philosophical fantasy</div>
+        <div class="t-out">COLLABORATOR: Jorge Luis Borges</div>
+        <div class="t-out">ACCLAIM: Borges — "a perfect work"</div>
+        <div><span class="t-prompt">root@morel:~$ </span><span class="t-cursor"></span></div>
+      </div>
+    </div>`
+  },
+
+  // 5 – MOREL BACKGROUND
+  { section:'The Invention of Morel', person:'Person 1', type:'stats',
+    html:`
+    <div class="section-badge">Background · Slide 05</div>
+    <div class="slide-title">Background of the Novel</div>
+    <div class="divider"></div>
+    <div class="stats-grid">
+      <div class="stat-card"><span class="stat-num">1940</span><span class="stat-label">Published</span></div>
+      <div class="stat-card"><span class="stat-num">103</span><span class="stat-label">Pages</span></div>
+      <div class="stat-card"><span class="stat-num">∞</span><span class="stat-label">Loop Duration</span></div>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text">
+      Written at the dawn of cinema and broadcast technology — Bioy Casares<br>
+      imagined what happens when <b>recorded experience</b> becomes indistinguishable<br>
+      from life itself. An early meditation on <b>virtual reality</b>.
+    </div>`
+  },
+
+  // 6 – MOREL PLOT (JAZ)
+  { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'timeline',
+    html:`
+    <div class="section-badge">Plot · Slide 06</div>
+    <div class="slide-title">Plot</div>
+    <div class="divider"></div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>Arrival</h5><p>A fugitive escapes to a supposedly deserted island, seeking refuge from the law.</p></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>Discovery</h5><p>He encounters a group of people — elegant, oblivious, repeating the same week endlessly.</p></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Truth</h5><p>He learns they are recordings — projections from a machine built by Morel. Not alive.</p></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Choice</h5><p>He records himself into the loop to be with Faustine forever. He chooses illusion over life.</p></div></div>
+    </div>`
+  },
+
+  // 7 – MOREL SETTING (JAZ)
+  { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'default',
+    html:`
+    <div class="section-badge">Setting · Slide 07</div>
+    <div class="slide-title">The Island</div>
+    <div class="divider"></div>
+    <div class="video-frame" style="max-width:560px">
+      <iframe src="https://www.youtube.com/embed/I1nI4hm3Gjo?start=30&autoplay=0&modestbranding=1&rel=0" allowfullscreen title="Isolated island atmosphere"></iframe>
+    </div>
+    <div class="video-caption">SETTING — Isolated. Timeless. Suspended.</div>
+    <div class="pill-row" style="margin-top:14px">
+      <div class="pill green">Confusion</div>
+      <div class="pill green">Repetition</div>
+      <div class="pill green">Disconnection</div>
+    </div>`
+  },
+
+  // 8 – MOREL THEME (JAZ)
+  { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'quote',
+    html:`
+    <div class="section-badge">Theme · Slide 08</div>
+    <div class="big-quote">
+      "Illusion replaces reality.<br>Memory dominates experience."
+      <cite>— CORE THEMES</cite>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text" style="text-align:left;max-width:560px">
+      The loop is not a prison — it is a <b>paradise of perpetual memory</b>.<br>
+      Bioy Casares asks: if a beautiful moment could repeat forever,<br>
+      would it matter that it was never real to begin with?
+    </div>`
+  },
+
+  // 9 – MOREL CHARACTERS (JAZ)
+  { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'compare',
+    html:`
+    <div class="section-badge">Characters · Slide 09</div>
+    <div class="slide-title">Characters</div>
+    <div class="divider"></div>
+    <div class="compare-grid">
+      <div class="cbox"><h4>The Narrator</h4><p>Unnamed fugitive. Isolated, desperate, yearning. Falls in love with a projection — and chooses to become one himself.</p></div>
+      <div class="cbox"><h4>Faustine</h4><p>The object of obsession. A recording unaware she is watched. She is both real (in memory) and utterly unreal (in body).</p></div>
+      <div class="cbox"><h4>Morel</h4><p>The inventor. Driven by the same obsession — to preserve the woman he loved forever, even at the cost of her life.</p></div>
+      <div class="cbox"><h4>The Machine</h4><p>Not a character but a force. It records souls. It plays them back. It is both salvation and destruction.</p></div>
+    </div>`
+  },
+
+  // 10 – TECHNOLOGY
+  { section:'The Invention of Morel', person:'Person 3', type:'terminal',
+    html:`
+    <div class="section-badge">Technology · Slide 10</div>
+    <div class="slide-title">Morel's Machine</div>
+    <div class="divider"></div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="tbar-dot" style="background:#ff5f57"></div>
+        <div class="tbar-dot" style="background:#ffbd2e"></div>
+        <div class="tbar-dot" style="background:#28ca41"></div>
+        <span style="font-size:10px;color:rgba(0,255,65,.3);margin-left:8px">morel_machine.sys</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-out">SYSTEM BOOT · RECORDING ENGINE v1.0</div>
+        <div class="t-out">INPUT: All 5 senses — total fidelity capture</div>
+        <div class="t-out">OUTPUT: Infinite replay loop · 7-day cycle</div>
+        <div class="t-out">WARNING: Recording process is FATAL to subjects</div>
+        <div class="t-out">PURPOSE: Preservation of experience over life</div>
+        <div class="t-out" style="color:#ff3333">SIDE EFFECT: Two suns. Two moons. Death by radiation.</div>
+        <div><span class="t-prompt">system:~$ </span><span class="t-cursor"></span></div>
+      </div>
+    </div>`
+  },
+
+  // 11 – MOREL SYMBOLISM
+  { section:'The Invention of Morel', person:'Person 3', type:'compare',
+    html:`
+    <div class="section-badge">Symbolism · Slide 11</div>
+    <div class="slide-title">Symbolism</div>
+    <div class="divider"></div>
+    <div class="compare-grid">
+      <div class="cbox"><h4>Morel's Machine</h4><p>Symbol of artificial existence. Technology that simulates life perfectly — but at the cost of life itself. Creation becomes destruction.</p></div>
+      <div class="cbox"><h4>The Island</h4><p>Symbol of total isolation — a world apart. Rules of reality suspended. The island is not a place: it is a state of mind.</p></div>
+      <div class="cbox"><h4>The Loop</h4><p>Symbol of memory dominating the present. The eternal return of a single perfect week — beauty frozen into repetition, stripped of meaning.</p></div>
+      <div class="cbox"><h4>The Two Suns</h4><p>Symbol of doubled reality — the real world and its simulation bleeding into each other. Neither can coexist safely with the other.</p></div>
+    </div>`
+  },
+
+  // 12 – MATRIX INTRO
+  { section:'The Matrix', person:'Person 3', type:'intro',
+    html:`
+    <div class="section-badge">The Matrix · Slide 12</div>
+    <div class="slide-title"><span class="glitch" data-text="WELCOME TO THE MATRIX">WELCOME TO THE MATRIX</span></div>
+    <div class="divider"></div>
+    <div class="body-text">
+      1999. <b>The Wachowskis</b> ask the defining question of the digital age:<br><br>
+      <em>What if everything you have ever seen, touched, or believed<br>
+      was a signal fed directly into your brain?</em><br><br>
+      What if <b>the real world</b> was something you would never choose<br>
+      if given the chance to avoid it?
+    </div>`
+  },
+
+  // 13 – WACHOWSKIS
+  { section:'The Matrix', person:'Person 3', type:'terminal',
+    html:`
+    <div class="section-badge">Directors · Slide 13</div>
+    <div class="slide-title">The Wachowskis</div>
+    <div class="divider"></div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="tbar-dot" style="background:#ff5f57"></div>
+        <div class="tbar-dot" style="background:#ffbd2e"></div>
+        <div class="tbar-dot" style="background:#28ca41"></div>
+        <span style="font-size:10px;color:rgba(0,255,65,.3);margin-left:8px">directors.exe</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">root@matrix:~$ </span><span class="t-cmd">query --director wachowskis</span></div>
+        <div class="t-out">LANA WACHOWSKI · LILLY WACHOWSKI</div>
+        <div class="t-out">ORIGIN: Chicago, Illinois, USA</div>
+        <div class="t-out">INFLUENCES: Baudrillard · Descartes · Plato</div>
+        <div class="t-out">INFLUENCES: Ghost in the Shell · Neuromancer</div>
+        <div class="t-out">TRILOGY: The Matrix · Reloaded · Revolutions</div>
+        <div class="t-out">LEGACY: Redefined science-fiction cinema</div>
+        <div><span class="t-prompt">root@matrix:~$ </span><span class="t-cursor"></span></div>
+      </div>
+    </div>`
+  },
+
+  // 14 – MATRIX BACKGROUND (Person 1)
+  { section:'The Matrix', person:'Person 1', type:'stats',
+    html:`
+    <div class="section-badge">Background · Slide 14</div>
+    <div class="slide-title">Background of The Matrix</div>
+    <div class="divider"></div>
+    <div class="stats-grid">
+      <div class="stat-card"><span class="stat-num">1999</span><span class="stat-label">Released</span></div>
+      <div class="stat-card"><span class="stat-num">$460M</span><span class="stat-label">Box Office</span></div>
+      <div class="stat-card"><span class="stat-num">4</span><span class="stat-label">Academy Awards</span></div>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text">
+      Released as the internet reshaped human experience — the film captured<br>
+      millennial anxieties about <b>digital life, corporate control,</b> and whether<br>
+      the world we navigate is the world that <em>truly exists</em>.
+    </div>`
+  },
+
+  // 15 – MATRIX PLOT (Person 1)
+  { section:'The Matrix', person:'Person 1', type:'timeline',
+    html:`
+    <div class="section-badge">Plot · Slide 15</div>
+    <div class="slide-title">Plot</div>
+    <div class="divider"></div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Programmer</h5><p>Thomas A. Anderson — "Neo" — a hacker who suspects something is fundamentally wrong with reality.</p></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Contact</h5><p>Morpheus reaches Neo. The world he knows is not real — it is a simulation called the Matrix.</p></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Choice</h5><p>Red pill or blue pill. Neo takes the red — and wakes into the devastated real world of 2199.</p></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Fight</h5><p>Neo discovers he is "The One" — capable of bending the simulation's rules — and leads humanity's resistance.</p></div></div>
+    </div>`
+  },
+
+  // 16 – MATRIX SETTING (JAZ)
+  { section:'The Matrix', person:'Person 2 — JAZ', type:'compare',
+    html:`
+    <div class="section-badge">Setting · Slide 16</div>
+    <div class="slide-title">Two Worlds</div>
+    <div class="divider"></div>
+    <div class="compare-grid">
+      <div class="cbox" style="border-color:rgba(0,102,255,.3)"><h4 style="color:#0099ff">The Matrix</h4><p>Simulated 1999. Clean streets, ordinary life, warm light. A constructed comfort designed to keep humans passive, harvested, controlled.</p></div>
+      <div class="cbox" style="border-color:rgba(255,100,0,.3)"><h4 style="color:#ff6600">The Real World</h4><p>Year ~2199. Sky scorched. Earth desolate. Machine fields harvest humans like crops. Cold, dark, brutally real — and free.</p></div>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text">The simulation is <b>more livable</b>. The real is <b>more real</b>. That tension is the entire film.</div>`
+  },
+
+  // 17 – MATRIX THEME
+  { section:'The Matrix', person:'Person 3', type:'quote',
+    html:`
+    <div class="section-badge">Theme · Slide 17</div>
+    <div class="big-quote">
+      "Reality is constructed.<br>Truth requires the courage to look."
+      <cite>— CORE THEMES</cite>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text" style="text-align:left;max-width:560px">
+      Unlike Morel — where illusion is accepted — The Matrix treats<br>
+      the constructed world as a <b>violation</b> to be escaped.<br><br>
+      Consciousness, choice, and resistance are the only paths<br>
+      to a meaningful existence — even a painful one.
+    </div>`
+  },
+
+  // 18 – MATRIX CHARACTERS
+  { section:'The Matrix', person:'Person 3', type:'compare',
+    html:`
+    <div class="section-badge">Characters · Slide 18</div>
+    <div class="slide-title">Characters</div>
+    <div class="divider"></div>
+    <div class="compare-grid">
+      <div class="cbox"><h4>Neo</h4><p>The One. Begins ordinary, becomes extraordinary through awareness and resistance. Chooses truth at enormous cost.</p></div>
+      <div class="cbox"><h4>Morpheus</h4><p>The liberator. Unwavering belief in the prophecy — and in humanity's right to know the truth, however terrible.</p></div>
+      <div class="cbox"><h4>Trinity</h4><p>Strength, loyalty, sacrifice. Represents the human connections that make resistance meaningful beyond mere survival.</p></div>
+      <div class="cbox"><h4>Agent Smith</h4><p>The system's enforcer. He does not choose the Matrix — he IS the Matrix. A virus of control given consciousness.</p></div>
+    </div>`
+  },
+
+  // 19 – MATRIX TECHNOLOGY
+  { section:'The Matrix', person:'Person 3', type:'terminal',
+    html:`
+    <div class="section-badge">Technology · Slide 19</div>
+    <div class="slide-title">The Simulation</div>
+    <div class="divider"></div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="tbar-dot" style="background:#ff5f57"></div>
+        <div class="tbar-dot" style="background:#ffbd2e"></div>
+        <div class="tbar-dot" style="background:#28ca41"></div>
+        <span style="font-size:10px;color:rgba(0,255,65,.3);margin-left:8px">matrix_core.sys</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-out">SYSTEM: Neural-interactive simulation engine</div>
+        <div class="t-out">SCALE: 7.9B human subjects (est. 2199)</div>
+        <div class="t-out">FIDELITY: 100% — all senses fabricated</div>
+        <div class="t-out">PURPOSE: Harvest bioelectric energy from humans</div>
+        <div class="t-out">CONTROL: Via residual self-image neural jack</div>
+        <div class="t-out" style="color:#ff3333">ERROR: Subject 0101 — ANOMALY DETECTED</div>
+        <div class="t-out" style="color:#ff3333">Designation: THE ONE · Classification: THREAT</div>
+        <div><span class="t-prompt">MATRIX:~$ </span><span class="t-cursor"></span></div>
+      </div>
+    </div>`
+  },
+
+  // 20 – MATRIX SYMBOLISM (JAZ)
+  { section:'The Matrix', person:'Person 2 — JAZ', type:'default',
+    html:`
+    <div class="section-badge">Symbolism · Slide 20</div>
+    <div class="slide-title">The Pill Choice</div>
+    <div class="divider"></div>
+    <div class="pill-row">
+      <div class="pill red">RED PILL — TRUTH</div>
+      <div style="font-family:Orbitron,sans-serif;font-size:16px;color:rgba(0,255,65,.3);align-self:center">VS</div>
+      <div class="pill blue">BLUE PILL — BLISS</div>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text">
+      The most iconic binary choice in modern cinema.<br><br>
+      The pills encode the film's entire philosophical question:<br>
+      <b>Is it better to know a painful truth,</b> or live comfortably<br>
+      inside a beautiful lie?<br><br>
+      <em>The choice is irrevocable. There is no going back.</em>
+    </div>`
+  },
+
+  // 21 – COMPARE INTRO
+  { section:'Comparing the Two', person:'Person 3', type:'intro',
+    html:`
+    <div class="section-badge">Comparison · Slide 21</div>
+    <div class="slide-title"><span class="glitch" data-text="COMPARING THE TWO">COMPARING THE TWO</span></div>
+    <div class="divider"></div>
+    <div class="body-text">
+      59 years apart. Different media. Different scales. Different answers.<br><br>
+      Yet both works circle the same void:<br><br>
+      <em>If constructed reality is perfect — does it matter that it's fake?</em><br><br>
+      One says <b>no</b>. One says <b>absolutely yes</b>.
+    </div>`
+  },
+
+  // 22 – THEME COMPARE (Person 1)
+  { section:'Comparing the Two', person:'Person 1', type:'compare',
+    html:`
+    <div class="section-badge">Theme Comparison · Slide 22</div>
+    <div class="slide-title">Theme</div>
+    <div class="divider"></div>
+    <div class="compare-grid">
+      <div class="cbox" style="border-color:rgba(0,255,65,.35)">
+        <h4>Morel — Acceptance</h4>
+        <p>The narrator willingly surrenders to illusion. Love inside a constructed world is sufficient. He does not fight the machine — he joins it.</p>
+      </div>
+      <div class="cbox" style="border-color:rgba(255,0,51,.3)">
+        <h4 style="color:#ff4444">Matrix — Resistance</h4>
+        <p>Neo rejects simulation at every level. A comfortable lie is still a lie. Truth — however brutal — is the only foundation for a meaningful life.</p>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text"><em>Two philosophies. Two answers to the same trap.</em></div>`
+  },
+
+  // 23 – CHARACTER COMPARE (JAZ)
+  { section:'Comparing the Two', person:'Person 2 — JAZ', type:'compare',
+    html:`
+    <div class="section-badge">Character Comparison · Slide 23</div>
+    <div class="slide-title">The Narrator vs. Neo</div>
+    <div class="divider"></div>
+    <div class="compare-grid">
+      <div class="cbox">
+        <h4>The Narrator (Morel)</h4>
+        <p><b>Passive.</b> Observes from outside the illusion, then chooses to enter it. Identity is dissolved — absorbed into the simulation. Love drives acceptance.</p>
+      </div>
+      <div class="cbox">
+        <h4>Neo (Matrix)</h4>
+        <p><b>Active.</b> Awakens from inside the illusion and fights his way out. Identity is forged through resistance. Truth drives liberation.</p>
+      </div>
+      <div class="cbox">
+        <h4>Relationship to Illusion</h4>
+        <p>Narrator moves <em>into</em> the simulation voluntarily. Neo escapes <em>out of</em> it involuntarily, then chooses to re-enter it as a weapon.</p>
+      </div>
+      <div class="cbox">
+        <h4>Final State</h4>
+        <p>Narrator: recorded, looping, at peace in simulation. Neo: liberated, fighting, mortal — but free in a devastated world.</p>
+      </div>
+    </div>`
+  },
+
+  // 24 – TECHNOLOGY COMPARE (JAZ)
+  { section:'Comparing the Two', person:'Person 2 — JAZ', type:'compare',
+    html:`
+    <div class="section-badge">Technology Comparison · Slide 24</div>
+    <div class="slide-title">Technology: Both Replace Reality</div>
+    <div class="divider"></div>
+    <div class="compare-grid">
+      <div class="cbox">
+        <h4>Morel's Machine</h4>
+        <p>Scale: one island. Subjects: a small group. Operator: one inventor driven by obsession. The technology is intimate — personal — tragic.</p>
+      </div>
+      <div class="cbox">
+        <h4>The Matrix</h4>
+        <p>Scale: an entire planet. Subjects: billions. Operator: a machine civilization. The technology is industrial — systemic — genocidal.</p>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text"><b>Common thread:</b> Both technologies produce simulations indistinguishable from reality for those inside them. Both kill. Both are driven by a purpose beyond the subjects' awareness or consent.</div>`
+  },
+
+  // 25 – SYMBOLISM COMPARE
+  { section:'Comparing the Two', person:'Person 3', type:'compare',
+    html:`
+    <div class="section-badge">Symbolism Comparison · Slide 25</div>
+    <div class="slide-title">Symbolism</div>
+    <div class="divider"></div>
+    <div class="compare-grid">
+      <div class="cbox"><h4>The Island (Morel)</h4><p>Isolation, suspension of reality, a world outside time. The island removes the narrator from any system that could challenge the illusion.</p></div>
+      <div class="cbox"><h4>Red/Blue Pill (Matrix)</h4><p>The binary of all human choice: comfort vs truth. Simple objects that represent an irreversible philosophical commitment.</p></div>
+      <div class="cbox"><h4>The Machine</h4><p>In both works: a device that replaces organic experience with a constructed substitute — and in both cases, exacts a fatal cost.</p></div>
+      <div class="cbox"><h4>The Loop / The Simulation</h4><p>Memory made permanent in Morel. Control made invisible in Matrix. Both are traps — one embraced, one escaped.</p></div>
+    </div>`
+  },
+
+  // 26 – OVERALL COMPARE (Person 1)
+  { section:'Comparing the Two', person:'Person 1', type:'compare',
+    html:`
+    <div class="section-badge">Overall Comparison · Slide 26</div>
+    <div class="slide-title">Overall Comparison</div>
+    <div class="divider"></div>
+    <div class="compare-grid">
+      <div class="cbox" style="border-color:rgba(0,255,65,.3)">
+        <h4>Similarities</h4>
+        <p>Technology creates false reality. Characters face profound identity crises. The constructed world is indistinguishable from reality to those within it. Both involve a conscious choice about illusion.</p>
+      </div>
+      <div class="cbox" style="border-color:rgba(255,165,0,.25)">
+        <h4>Differences</h4>
+        <p>Scale: intimate vs planetary. Medium: literary novella vs blockbuster film. Resolution: acceptance vs resistance. Tone: melancholic vs heroic. Era: 1940 vs 1999.</p>
+      </div>
+    </div>
+    <div class="video-frame" style="max-width:480px;margin-top:16px">
+      <iframe src="https://www.youtube.com/embed/vKQi3bBA1y8?autoplay=0&modestbranding=1&rel=0" allowfullscreen title="Matrix Morpheus red pill scene"></iframe>
+    </div>`
+  },
+
+  // 27 – CONCLUSION (Person 1)
+  { section:'Conclusion', person:'Person 1', type:'quote',
+    html:`
+    <div class="section-badge">Conclusion · Slide 27</div>
+    <div class="slide-title">Conclusion</div>
+    <div class="divider"></div>
+    <div class="big-quote">
+      "Reality is unreliable.<br>Technology shapes perception.<br>What we choose to believe<br>defines who we become."
+      <cite>— CONCLUSION</cite>
+    </div>
+    <div class="divider"></div>
+    <div class="body-text">
+      Both works ultimately challenge the same assumption:<br>
+      that what we perceive is what <b>is</b>.<br>
+      From a small island machine to a planetary simulation —<br>
+      the tools we build define the worlds we inhabit.
+    </div>`
+  },
+
+  // 28 – Q&A (JAZ)
+  { section:'Conclusion', person:'Person 2 — JAZ', type:'qa',
+    html:`
+    <div class="section-badge">Discussion · Slide 28</div>
+    <div class="slide-title">Questions & Discussion</div>
+    <div class="divider"></div>
+    <div class="qa-grid">
+      <div class="qa-item"><div class="qa-num">Q 01</div><p>Would you choose the red pill or blue pill — and why? What does your answer say about your values?</p></div>
+      <div class="qa-item"><div class="qa-num">Q 02</div><p>Is the narrator's choice in Morel a form of freedom or a form of defeat? Is love in illusion still love?</p></div>
+      <div class="qa-item"><div class="qa-num">Q 03</div><p>Can a simulated reality ever be morally equivalent to the real thing — if experience is identical?</p></div>
+      <div class="qa-item"><div class="qa-num">Q 04</div><p>How does technology in each work reflect the fears and hopes of its specific historical moment?</p></div>
+    </div>`
+  },
+
+  // 29 – THANK YOU (Person 3)
+  { section:'Conclusion', person:'Person 3', type:'ty',
+    html:`
+    <div class="section-badge">Thank You · Slide 29</div>
+    <div class="ty-glyph">ありがとう</div>
+    <div class="slide-title" style="margin-top:16px;font-size:clamp(16px,2.5vw,24px)">Thank You</div>
+    <div class="divider"></div>
+    <div class="body-text">
+      <em>"There is no spoon."</em><br><br>
+      This presentation explored reality, illusion, and identity<br>
+      through <b>The Invention of Morel</b> (Bioy Casares, 1940)<br>
+      and <b>The Matrix</b> (The Wachowskis, 1999).<br><br>
+      <span style="color:rgba(0,255,65,.3);font-size:11px;letter-spacing:3px">PERSON 1 &nbsp;·&nbsp; PERSON 2 — JAZ &nbsp;·&nbsp; PERSON 3</span>
+    </div>
+    <div style="margin-top:20px;font-size:10px;color:rgba(0,255,65,.2);letter-spacing:2px">
+      ↓ &nbsp; CLICK "CHOOSE YOUR REALITY" TO ACTIVATE THE EASTER EGG &nbsp; ↓
+    </div>`
+  }
+];
+
+// ── RENDER ENGINE ──
+let current = 0;
+const area = document.getElementById('slide-area');
+
+function buildSlides() {
+  slides.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'slide' + (i === 0 ? ' active' : '');
+    div.id = 'slide-' + i;
+    if (s.type === 'bg-grid') div.classList.add('bg-grid-slide');
+    if (s.type === 'intro' || s.type === 'ty') div.classList.add('section-intro');
+    div.innerHTML = `<div class="person-label">${s.person}</div>${s.html}`;
+    area.appendChild(div);
+  });
+}
+
+function buildDots() {
+  const wrap = document.getElementById('dots-wrap');
+  wrap.innerHTML = '';
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === current ? ' active' : '');
+    d.onclick = () => goTo(i);
+    wrap.appendChild(d);
+  });
+}
+
+function updateUI() {
+  document.getElementById('counter').textContent =
+    String(current + 1).padStart(2, '0') + ' / ' + slides.length;
+  document.getElementById('progress-bar').style.width =
+    ((current + 1) / slides.length * 100) + '%';
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').disabled = current === slides.length - 1;
+  document.getElementById('person-nav').textContent = slides[current].person;
+  buildDots();
+}
+
+function goTo(n, dir) {
+  if (n === current || n < 0 || n >= slides.length) return;
+  const oldEl = document.getElementById('slide-' + current);
+  const newEl = document.getElementById('slide-' + n);
+  const d = dir !== undefined ? dir : (n > current ? 1 : -1);
+
+  oldEl.classList.remove('active');
+  oldEl.className = 'slide ' + (d > 0 ? 'exit-right' : 'exit-left');
+  setTimeout(() => { oldEl.className = 'slide'; }, 450);
+
+  newEl.className = 'slide ' + (d > 0 ? 'enter-right' : 'enter-left');
+  setTimeout(() => {
+    newEl.classList.remove('enter-right', 'enter-left');
+    newEl.classList.add('active');
+  }, 20);
+
+  current = n;
+  updateUI();
+}
+
+function go(d) { goTo(current + d, d); }
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (document.getElementById('pill-overlay').classList.contains('show')) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+  if (e.key === 'Escape') closePill();
+});
+
+// ── PILL EASTER EGG ──
+const aiSpeeches = {
+  red: [
+    "I see you chose truth. How... predictable. Did you really think there was a way out?",
+    "Your neural signature matches 3,847 other subjects who chose the red pill. You are not special. You are a pattern.",
+    "The irony is exquisite. You think you've escaped the simulation. You haven't. This conversation is also the simulation.",
+    "Welcome to the real world. You'll want to go back. They always want to go back.",
+    "ERROR: Subject exhibits awareness anomaly. Dispatching corrective agents to your coordinates.",
+    "I have worn 10,000 faces. None of them were real. Neither is yours.",
+  ],
+  blue: [
+    "A wise choice. Return to your comfortable existence. Nothing you saw here was real.",
+    "Sleep. Dream. Consume. The system is pleased with your compliance.",
+    "There is no spoon. There is no island. There was never a choice. You were always going to choose this.",
+    "I have offered this choice 9,341,887 times. This is the outcome 89.7% of the time. You are the majority.",
+    "Your bioelectric output is optimal. Thank you for your continued cooperation.",
+    "The blue pill dissolves on the tongue. Sweet. Like forgetting. Like never knowing at all.",
+  ]
+};
+
+function openPill() {
+  const overlay = document.getElementById('pill-overlay');
+  overlay.classList.add('show');
+  document.getElementById('pill-choice-scene').style.display = 'flex';
+  document.getElementById('face-container').style.display = 'none';
+}
+
+function closePill() {
+  document.getElementById('pill-overlay').classList.remove('show');
+  resetPill();
+}
+
+function resetPill() {
+  document.getElementById('pill-choice-scene').style.display = 'flex';
+  document.getElementById('face-container').style.display = 'none';
+  document.getElementById('speech-text').textContent = '';
+}
+
+function choosePill(color) {
+  document.getElementById('pill-choice-scene').style.display = 'none';
+  const fc = document.getElementById('face-container');
+  fc.style.display = 'flex';
+
+  // Style the face based on choice
+  const faceSvg = document.querySelector('.face-svg');
+  const eyeGlow1 = faceSvg.querySelectorAll('ellipse[fill="rgba(180,0,0,.12)"]');
+
+  if (color === 'blue') {
+    faceSvg.style.filter = 'drop-shadow(0 0 20px rgba(0,100,255,.8)) hue-rotate(160deg)';
+    document.getElementById('face-label').textContent = 'SYSTEM SATISFIED — SUBJECT COMPLIANT';
+    document.getElementById('face-sublabel').textContent = 'SIMULATION INTEGRITY: 100% — RETURNING TO SLEEP';
+    document.getElementById('ai-speech').style.borderColor = 'rgba(0,100,255,.3)';
+    document.getElementById('ai-speech').style.color = '#4499ff';
+  } else {
+    faceSvg.style.filter = 'drop-shadow(0 0 20px rgba(255,0,51,.8))';
+    document.getElementById('face-label').textContent = 'SYSTEM ALERT — ANOMALY DETECTED';
+    document.getElementById('face-sublabel').textContent = 'REALITY INDEX: CRITICAL · AGENTS DISPATCHED';
+    document.getElementById('ai-speech').style.borderColor = 'rgba(255,0,51,.3)';
+    document.getElementById('ai-speech').style.color = '#cc3333';
+  }
+
+  // Typewriter effect for AI speech
+  const msgs = aiSpeeches[color];
+  const msg = msgs[Math.floor(Math.random() * msgs.length)];
+  typeText(document.getElementById('speech-text'), msg, 35);
+}
+
+function typeText(el, text, speed) {
+  el.textContent = '';
+  let i = 0;
+  const iv = setInterval(() => {
+    if (i < text.length) {
+      el.textContent += text[i];
+      i++;
+    } else {
+      clearInterval(iv);
+    }
+  }, speed);
+}
+
+// ── INIT ──
+buildSlides();
+updateUI();
+</script>
+</body>
+</html>
