@@ -1,4 +1,3 @@
-const MODEL = 'HuggingFaceH4/zephyr-7b-beta';
 const HF_URL = 'https://router.huggingface.co/v1/chat/completions';
 const MAX_HISTORY_MESSAGES = 8;
 
@@ -96,6 +95,7 @@ function buildSystemPrompt({ stage, suspicionCount, pill }) {
 }
 
 async function queryModel({ messages, stage, apiKey }) {
+  const model = process.env.HF_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
   const response = await fetch(HF_URL, {
     method: 'POST',
     headers: {
@@ -103,7 +103,7 @@ async function queryModel({ messages, stage, apiKey }) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: MODEL,
+      model,
       messages,
       temperature: stage === 'reveal' ? 0.9 : 0.75,
       max_tokens: 220
