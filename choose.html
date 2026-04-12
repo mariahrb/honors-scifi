@@ -51,10 +51,10 @@ body::after {
 
 body.is-page-transition .shell,
 body.is-page-transition .back-link {
-  opacity: 0.16;
-  transform: scale(.992);
-  filter: blur(2px);
-  transition: opacity .18s ease, transform .18s ease, filter .18s ease;
+  opacity: 0;
+  transform: scale(.98);
+  filter: blur(8px);
+  transition: opacity .25s ease, transform .25s ease, filter .25s ease;
 }
 
 #page-transition {
@@ -64,8 +64,8 @@ body.is-page-transition .back-link {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity .22s ease, visibility .22s ease;
-  background: radial-gradient(circle at 50% 50%, rgba(0,255,65,0.08), rgba(0,0,0,0.94) 62%);
+  transition: opacity .3s ease, visibility .3s ease;
+  background: #000;
 }
 
 #page-transition.active {
@@ -83,12 +83,34 @@ body.is-page-transition .back-link {
 .transition-copy {
   position: absolute;
   left: 50%;
-  bottom: 10vh;
-  transform: translateX(-50%);
-  font-size: 11px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  z-index: 1;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(14px, 2.2vw, 20px);
+  letter-spacing: 6px;
+  color: #00ff41;
+  text-shadow: 0 0 20px rgba(0,255,65,.9), 0 0 50px rgba(0,255,65,.5), 0 0 100px rgba(0,255,65,.2);
+  animation: transitionGlitch .18s infinite;
+}
+
+.transition-sub {
+  display: block;
+  margin-top: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
   letter-spacing: 4px;
-  color: rgba(0,255,65,.72);
-  text-shadow: 0 0 18px rgba(0,255,65,.25);
+  color: rgba(0,255,65,.4);
+  animation: none;
+}
+
+@keyframes transitionGlitch {
+  0%, 85%, 100% { opacity: 1; transform: translate(-50%, -50%) skewX(0); }
+  88% { opacity: .7; transform: translate(-48%, -50%) skewX(4deg); color: #0ff; text-shadow: 2px 0 rgba(255,0,0,.5), -2px 0 rgba(0,255,255,.5), 0 0 20px #0ff; }
+  91% { opacity: 1; transform: translate(-52%, -50%) skewX(-2deg); }
+  94% { opacity: .9; transform: translate(-50%, -50%) skewX(1deg); }
 }
 
 .shell {
@@ -368,7 +390,7 @@ body.is-page-transition .back-link {
 <a class="back-link" href="/">BACK TO PRESENTATION</a>
 <div id="page-transition" aria-hidden="true">
   <canvas id="transition-canvas"></canvas>
-  <div class="transition-copy" id="transition-copy">SYSTEM TRANSFER</div>
+  <div class="transition-copy" id="transition-copy">CONNECTION REROUTED<span class="transition-sub" id="transition-sub"></span></div>
 </div>
 
 <main class="shell">
@@ -547,24 +569,23 @@ function setupRainTransition() {
   function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    cols = Math.max(1, Math.floor(canvas.width / 18));
+    cols = Math.max(1, Math.floor(canvas.width / 14));
     drops = Array(cols).fill(0).map(() => Math.random() * -40);
   }
 
   function draw() {
-    ctx.fillStyle = 'rgba(0,0,0,0.16)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = 'bold 16px monospace';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = 'bold 15px monospace';
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = '#00ff41';
     drops.forEach((drop, index) => {
       const char = chars[Math.floor(Math.random() * chars.length)];
-      const x = index * 18;
-      const y = drop * 18;
-      ctx.fillStyle = index % 6 === 0 ? '#c7ffd8' : '#00ff41';
-      ctx.shadowBlur = 14;
-      ctx.shadowColor = '#00ff41';
+      const x = index * 14;
+      const y = drop * 14;
+      ctx.fillStyle = index % 5 === 0 ? '#c0ffd0' : '#00ff41';
       ctx.fillText(char, x, y);
-      if (y > canvas.height && Math.random() > 0.9) drops[index] = Math.random() * -8;
-      drops[index] += 1.9 + Math.random() * 1.2;
+      if (y > canvas.height && Math.random() > 0.88) drops[index] = Math.random() * -12;
+      drops[index] += 2.5 + Math.random() * 1.8;
     });
     animationId = requestAnimationFrame(draw);
   }
@@ -572,7 +593,8 @@ function setupRainTransition() {
   function beginNavigation(href, text) {
     if (navigating) return;
     navigating = true;
-    label.textContent = text || 'SYSTEM TRANSFER';
+    const sub = document.getElementById('transition-sub');
+    if (sub) sub.textContent = text ? '[ ' + text + ' ]' : '';
     resize();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     document.body.classList.add('is-page-transition');
@@ -581,7 +603,7 @@ function setupRainTransition() {
     setTimeout(() => {
       cancelAnimationFrame(animationId);
       window.location.href = href;
-    }, 760);
+    }, 900);
   }
 
   window.addEventListener('resize', resize);

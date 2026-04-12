@@ -198,10 +198,6 @@ body:hover #cursor{opacity:1}
   transition:border-color .3s,background .3s;
   position:relative;overflow:hidden;
 }
-.cbox::before {
-  content:'';position:absolute;top:0;left:0;width:3px;height:100%;
-  background:var(--green);opacity:.4;
-}
 .cbox:hover{border-color:rgba(0,255,65,.5);background:rgba(0,255,65,.06)}
 .cbox h4{color:var(--green);font-size:12px;letter-spacing:2px;margin-bottom:10px;font-family:'Orbitron',sans-serif;font-size:11px}
 .cbox p{color:var(--green-dim);font-size:12px;line-height:1.7}
@@ -338,17 +334,18 @@ body:hover #cursor{opacity:1}
 .nav-btn:hover{background:rgba(0,255,65,.1);border-color:var(--green);box-shadow:0 0 14px rgba(0,255,65,.2)}
 .nav-btn:disabled{opacity:.15;cursor:default;box-shadow:none}
 
-#dots-wrap{display:flex;gap:5px;flex-wrap:wrap;max-width:400px;justify-content:center}
-.dot{
-  width:8px;height:8px;border-radius:50%;
-  background:rgba(0,255,65,.12);border:1px solid rgba(0,255,65,.25);
-  cursor:pointer;transition:all .2s;flex-shrink:0;
+#dots-wrap{display:flex;gap:4px;align-items:center;width:clamp(140px,28vw,340px)}
+.snav-item{
+  height:3px;border-radius:3px;border:none;padding:0;background:rgba(0,255,65,.12);
+  cursor:pointer;transition:background .2s,transform .15s;flex:1;min-width:0;
 }
-.dot.active{background:var(--green);box-shadow:0 0 8px var(--green)}
-.dot:hover{background:rgba(0,255,65,.4)}
-
-.slide-person-nav {
-  font-size:9px;letter-spacing:2px;color:rgba(0,255,65,.3);text-align:center;min-width:80px;
+.snav-item.past{background:rgba(0,255,65,.3)}
+.snav-item.active{background:var(--green);box-shadow:0 0 8px rgba(0,255,65,.65)}
+.snav-item:hover{background:rgba(0,255,65,.5);transform:scaleY(2.5);transform-origin:center}
+#snav-label{
+  font-size:8px;letter-spacing:2px;color:rgba(0,255,65,.28);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:clamp(140px,28vw,340px);
 }
 
 /* ── SECTION INTRO SLIDES ── */
@@ -537,23 +534,39 @@ body:hover #cursor{opacity:1}
 /* ── PAGE TRANSITION ── */
 #page-transition{
   position:fixed;inset:0;z-index:2000;pointer-events:none;
-  opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease;
-  background:radial-gradient(circle at 50% 50%, rgba(0,255,65,.08), rgba(0,0,0,.94) 62%);
+  opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease;
+  background:#000;
 }
 #page-transition.active{opacity:1;visibility:visible}
 #transition-canvas{
   position:absolute;inset:0;width:100%;height:100%;
 }
 .transition-copy{
-  position:absolute;left:50%;bottom:10vh;transform:translateX(-50%);
-  font-size:11px;letter-spacing:4px;color:rgba(0,255,65,.72);
-  text-shadow:0 0 18px rgba(0,255,65,.25);
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  text-align:center;pointer-events:none;z-index:1;
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(14px,2.2vw,20px);letter-spacing:6px;
+  color:#00ff41;
+  text-shadow:0 0 20px rgba(0,255,65,.9),0 0 50px rgba(0,255,65,.5),0 0 100px rgba(0,255,65,.2);
+  animation:transitionGlitch .18s infinite;
+}
+.transition-sub{
+  display:block;margin-top:12px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;letter-spacing:4px;color:rgba(0,255,65,.4);
+  animation:none;
+}
+@keyframes transitionGlitch{
+  0%,85%,100%{opacity:1;transform:translate(-50%,-50%) skewX(0)}
+  88%{opacity:.7;transform:translate(-48%,-50%) skewX(4deg);color:#0ff;text-shadow:2px 0 rgba(255,0,0,.5),-2px 0 rgba(0,255,255,.5),0 0 20px #0ff}
+  91%{opacity:1;transform:translate(-52%,-50%) skewX(-2deg)}
+  94%{opacity:.9;transform:translate(-50%,-50%) skewX(1deg)}
 }
 body.is-page-transition #pres,
 body.is-page-transition #quick-links,
 body.is-page-transition #cursor{
-  opacity:.16;transform:scale(.992);filter:blur(2px);
-  transition:opacity .18s ease,transform .18s ease,filter .18s ease;
+  opacity:0;transform:scale(.98);filter:blur(8px);
+  transition:opacity .25s ease,transform .25s ease,filter .25s ease;
 }
 
 /* ── Q&A BOXES ── */
@@ -584,6 +597,23 @@ body.is-page-transition #cursor{
   background-size:40px 40px;
 }
 
+/* ── SYMBOL LIST ── */
+.sym-list{width:100%;max-width:620px}
+.sym-item{
+  display:flex;align-items:flex-start;gap:18px;
+  border-bottom:1px solid rgba(0,255,65,.08);padding:12px 0;
+}
+.sym-item:last-child{border-bottom:none}
+.sym-glyph{
+  font-family:'VT323',monospace;font-size:34px;
+  color:rgba(0,255,65,.4);flex-shrink:0;width:38px;text-align:center;line-height:1.1;
+}
+.sym-body h5{
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;
+  color:var(--green);margin-bottom:4px;
+}
+.sym-body p{font-size:12px;color:var(--green-dim);line-height:1.6}
+
 /* AI Speech messages */
 .ai-msgs{display:none}
 
@@ -594,12 +624,16 @@ body.is-page-transition #cursor{
   .qr-copy{text-align:center}
   .pill-choices{gap:30px}
   #pres{font-size:13px}
-  #quick-links{
-    left:12px;right:12px;bottom:72px;align-items:stretch;
-  }
-  .quick-link{
-    min-width:0;width:100%;
-  }
+  #quick-links{left:12px;right:12px;bottom:72px;align-items:stretch}
+  .quick-link{min-width:0;width:100%}
+  #topbar .logo{font-size:8px;letter-spacing:1px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nav-btn{font-size:10px;padding:8px 12px;letter-spacing:1px}
+  .slide{padding:20px 18px}
+  #snav-label{font-size:7px;letter-spacing:1px}
+  .world-split{grid-template-columns:1fr!important}
+  .world-sim{border-right:none!important;border-bottom:1px solid rgba(0,255,65,.1)}
+  .philosophy-split{grid-template-columns:1fr!important}
+  .phil-resist{border-left:none!important;border-top:1px solid rgba(255,0,51,.2)}
 }
 </style>
 </head>
@@ -617,7 +651,7 @@ body.is-page-transition #cursor{
 
 <div id="page-transition" aria-hidden="true">
   <canvas id="transition-canvas"></canvas>
-  <div class="transition-copy" id="transition-copy">SYSTEM TRANSFER</div>
+  <div class="transition-copy" id="transition-copy">CONNECTION REROUTED<span class="transition-sub" id="transition-sub"></span></div>
 </div>
 
 <!-- MAIN PRESENTATION -->
@@ -630,9 +664,9 @@ body.is-page-transition #cursor{
   <div id="slide-area" id="slides"></div>
   <div id="nav">
     <button class="nav-btn" id="prev-btn" onclick="go(-1)" disabled>◀ PREV</button>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div id="dots-wrap"></div>
-      <div class="slide-person-nav" id="person-nav"></div>
+      <div id="snav-label"></div>
     </div>
     <button class="nav-btn" id="next-btn" onclick="go(1)">NEXT ▶</button>
   </div>
@@ -691,24 +725,23 @@ function setupRainTransition() {
   function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    cols = Math.max(1, Math.floor(canvas.width / 18));
+    cols = Math.max(1, Math.floor(canvas.width / 14));
     drops = Array(cols).fill(0).map(() => Math.random() * -40);
   }
 
   function draw() {
-    ctx.fillStyle = 'rgba(0,0,0,0.16)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = 'bold 16px monospace';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = 'bold 15px monospace';
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = '#00ff41';
     drops.forEach((drop, index) => {
       const char = chars[Math.floor(Math.random() * chars.length)];
-      const x = index * 18;
-      const y = drop * 18;
-      ctx.fillStyle = index % 6 === 0 ? '#c7ffd8' : '#00ff41';
-      ctx.shadowBlur = 14;
-      ctx.shadowColor = '#00ff41';
+      const x = index * 14;
+      const y = drop * 14;
+      ctx.fillStyle = index % 5 === 0 ? '#c0ffd0' : '#00ff41';
       ctx.fillText(char, x, y);
-      if (y > canvas.height && Math.random() > 0.9) drops[index] = Math.random() * -8;
-      drops[index] += 1.9 + Math.random() * 1.2;
+      if (y > canvas.height && Math.random() > 0.88) drops[index] = Math.random() * -12;
+      drops[index] += 2.5 + Math.random() * 1.8;
     });
     animationId = requestAnimationFrame(draw);
   }
@@ -716,7 +749,8 @@ function setupRainTransition() {
   function beginNavigation(href, text) {
     if (navigating) return;
     navigating = true;
-    label.textContent = text || 'SYSTEM TRANSFER';
+    const sub = document.getElementById('transition-sub');
+    if (sub) sub.textContent = text ? '[ ' + text + ' ]' : '';
     resize();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     document.body.classList.add('is-page-transition');
@@ -725,7 +759,7 @@ function setupRainTransition() {
     setTimeout(() => {
       cancelAnimationFrame(animationId);
       window.location.href = href;
-    }, 760);
+    }, 900);
   }
 
   window.addEventListener('resize', resize);
@@ -747,7 +781,7 @@ function setupRainTransition() {
 // ── SLIDES DATA ──
 const slides = [
   // 1 – INTRO
-  { section:'Introduction', person:'Person 1', type:'intro',
+  { section:'Introduction', person:'Mariah', type:'intro',
     html:`
     <div class="section-badge">Introduction · Slide 01</div>
     <div class="slide-title"><span class="glitch" data-text="REALITY vs SIMULATION">REALITY vs SIMULATION</span></div>
@@ -765,7 +799,7 @@ const slides = [
   },
 
   // 2 – QR INVITE
-  { section:'Introduction', person:'Person 1', type:'default',
+  { section:'Introduction', person:'Mariah', type:'default',
     html:`
     <div class="section-badge">Interactive Invite · Slide 02</div>
     <div class="slide-title">Join Us In This Experience</div>
@@ -784,62 +818,80 @@ const slides = [
   },
 
   // 3 – OPENING STATEMENT
-  { section:'Introduction', person:'Person 1', type:'quote',
+  { section:'Introduction', person:'Samarth', type:'quote',
     html:`
     <div class="section-badge">Opening Statement · Slide 03</div>
-    <div class="big-quote">
-      "Reality is based on perception.<br>Perception can be manipulated."
-      <cite>— CENTRAL THESIS</cite>
-    </div>
-    <div class="divider"></div>
-    <div class="body-text" style="text-align:left;max-width:520px">
-      If our senses can be fooled completely — and technology can manufacture<br>
-      sensation indistinguishable from the real — does <b>objective reality</b> have<br>
-      any meaning left?
+    <div style="display:flex;gap:24px;align-items:center;width:100%;max-width:660px">
+      <img src="https://covers.openlibrary.org/b/isbn/9781590170908-L.jpg"
+           alt="The Invention of Morel — book cover"
+           style="height:150px;width:auto;flex-shrink:0;border:1px solid rgba(0,255,65,.3);box-shadow:0 0 24px rgba(0,255,65,.12)">
+      <div>
+        <div class="big-quote" style="font-size:clamp(14px,1.8vw,22px)">
+          "Reality is based on perception.<br>Perception can be manipulated."
+          <cite>— CENTRAL THESIS</cite>
+        </div>
+        <div class="divider"></div>
+        <div class="body-text" style="text-align:left">
+          If our senses can be fooled completely — and technology can manufacture<br>
+          sensation indistinguishable from the real — does <b>objective reality</b> have<br>
+          any meaning left?
+        </div>
+      </div>
     </div>`
   },
 
   // 4 – MOREL INTRO
-  { section:'The Invention of Morel', person:'Person 1', type:'bg-grid',
+  { section:'The Invention of Morel', person:'Samarth', type:'bg-grid',
     html:`
     <div class="section-badge">The Invention of Morel · Slide 04</div>
-    <div class="slide-title">The Invention of Morel</div>
+    <div class="slide-title"><span class="glitch" data-text="THE INVENTION OF MOREL">THE INVENTION OF MOREL</span></div>
     <div class="divider"></div>
     <div class="body-text">
       A novella by <b>Adolfo Bioy Casares</b> — published <b>1940</b>, Buenos Aires.<br><br>
       A fugitive hides on a deserted island. He encounters a group of people<br>
       living in an uncanny loop — eating, dancing, laughing — oblivious to him.<br><br>
       <em>The question is not just who they are — but what they are.</em>
+    </div>
+    <div class="pill-row" style="margin-top:18px">
+      <div class="pill green">FUGITIVE</div>
+      <div class="pill green">ISLAND</div>
+      <div class="pill green">LOOP</div>
+      <div class="pill green">OBSESSION</div>
     </div>`
   },
 
   // 5 – AUTHOR
-  { section:'The Invention of Morel', person:'Person 1', type:'terminal',
+  { section:'The Invention of Morel', person:'Samarth', type:'terminal',
     html:`
     <div class="section-badge">Author · Slide 05</div>
     <div class="slide-title">Adolfo Bioy Casares</div>
     <div class="divider"></div>
-    <div class="terminal">
-      <div class="terminal-bar">
-        <div class="tbar-dot" style="background:#ff5f57"></div>
-        <div class="tbar-dot" style="background:#ffbd2e"></div>
-        <div class="tbar-dot" style="background:#28ca41"></div>
-        <span style="font-size:10px;color:rgba(0,255,65,.3);margin-left:8px">author.exe</span>
-      </div>
-      <div class="terminal-body">
-        <div><span class="t-prompt">root@morel:~$ </span><span class="t-cmd">query --author bioy_casares</span></div>
-        <div class="t-out">NAME: Adolfo Bioy Casares</div>
-        <div class="t-out">BORN: Buenos Aires, 1914 · DIED: 1999</div>
-        <div class="t-out">GENRE: Speculative fiction · Philosophical fantasy</div>
-        <div class="t-out">COLLABORATOR: Jorge Luis Borges</div>
-        <div class="t-out">ACCLAIM: Borges — "a perfect work"</div>
-        <div><span class="t-prompt">root@morel:~$ </span><span class="t-cursor"></span></div>
+    <div style="display:flex;gap:20px;align-items:flex-start;width:100%;max-width:680px">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Adolfo_Bioy_Casares_by_Eduardo_Comesaña.jpg"
+           alt="Adolfo Bioy Casares"
+           style="height:180px;width:auto;flex-shrink:0;border:1px solid rgba(0,255,65,.3);box-shadow:0 0 20px rgba(0,255,65,.12)">
+      <div class="terminal" style="flex:1;min-width:0">
+        <div class="terminal-bar">
+          <div class="tbar-dot" style="background:#ff5f57"></div>
+          <div class="tbar-dot" style="background:#ffbd2e"></div>
+          <div class="tbar-dot" style="background:#28ca41"></div>
+          <span style="font-size:10px;color:rgba(0,255,65,.3);margin-left:8px">author.exe</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-prompt">root@morel:~$ </span><span class="t-cmd">query --author bioy_casares</span></div>
+          <div class="t-out">NAME: Adolfo Bioy Casares</div>
+          <div class="t-out">BORN: Buenos Aires, 1914 · DIED: 1999</div>
+          <div class="t-out">GENRE: Speculative fiction · Philosophical fantasy</div>
+          <div class="t-out">COLLABORATOR: Jorge Luis Borges</div>
+          <div class="t-out">ACCLAIM: Borges — "a perfect work"</div>
+          <div><span class="t-prompt">root@morel:~$ </span><span class="t-cursor"></span></div>
+        </div>
       </div>
     </div>`
   },
 
   // 6 – MOREL BACKGROUND
-  { section:'The Invention of Morel', person:'Person 1', type:'stats',
+  { section:'The Invention of Morel', person:'Samarth', type:'stats',
     html:`
     <div class="section-badge">Background · Slide 06</div>
     <div class="slide-title">Background of the Novel</div>
@@ -858,43 +910,65 @@ const slides = [
   },
 
   // 7 – MOREL PLOT (JAZ)
-  { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'timeline',
+  { section:'The Invention of Morel', person:'Jaz', type:'timeline',
     html:`
     <div class="section-badge">Plot · Slide 07</div>
     <div class="slide-title">Plot</div>
     <div class="divider"></div>
-    <div class="timeline">
-      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>Arrival</h5><p>A fugitive escapes to a supposedly deserted island, seeking refuge from the law.</p></div></div>
-      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>Discovery</h5><p>He encounters a group of people — elegant, oblivious, repeating the same week endlessly.</p></div></div>
-      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Truth</h5><p>He learns they are recordings — projections from a machine built by Morel. Not alive.</p></div></div>
-      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Choice</h5><p>He records himself into the loop to be with Faustine forever. He chooses illusion over life.</p></div></div>
+    <div style="display:flex;gap:20px;align-items:flex-start;width:100%;max-width:820px">
+      <div class="timeline" style="flex:1">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>Arrival</h5><p>A fugitive escapes to a supposedly deserted island, seeking refuge from the law.</p></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>Discovery</h5><p>He encounters a group of people — elegant, oblivious, repeating the same week endlessly.</p></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Truth</h5><p>He learns they are recordings — projections from a machine built by Morel. Not alive.</p></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Choice</h5><p>He records himself into the loop to be with Faustine forever. He chooses illusion over life.</p></div></div>
+      </div>
+      <div style="flex:0 0 300px">
+        <div class="video-frame">
+          <iframe src="https://www.youtube.com/embed/G79Hk2yYCic?modestbranding=1&rel=0" allowfullscreen title="The Invention of Morel"></iframe>
+        </div>
+        <div class="video-caption">THE INVENTION OF MOREL</div>
+      </div>
     </div>`
   },
 
   // 7 – MOREL SETTING (JAZ)
-  { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'default',
+  { section:'The Invention of Morel', person:'Jaz', type:'default',
     html:`
     <div class="section-badge">Setting · Slide 08</div>
     <div class="slide-title">The Island</div>
     <div class="divider"></div>
-    <div class="video-frame" style="max-width:560px">
-      <iframe src="https://www.youtube.com/embed/I1nI4hm3Gjo?start=30&autoplay=0&modestbranding=1&rel=0" allowfullscreen title="Isolated island atmosphere"></iframe>
+    <div class="compare-grid">
+      <div class="cbox">
+        <h4>Location</h4>
+        <p>A remote, unnamed island — cut off from the world. No maps. No visitors. A place the fugitive chose precisely because no one would follow.</p>
+      </div>
+      <div class="cbox">
+        <h4>The Museum &amp; Villas</h4>
+        <p>Strange architecture sits abandoned — or so it seems. A museum, a swimming pool, a chapel. Built by Morel for one specific, terrible purpose.</p>
+      </div>
+      <div class="cbox">
+        <h4>Time Suspended</h4>
+        <p>The same week plays on loop forever. Tides rise and fall on schedule. The sun, the music, the guests — all repeating, indifferent to the narrator's presence.</p>
+      </div>
+      <div class="cbox">
+        <h4>The Two Suns</h4>
+        <p>The machine's operation causes two suns and two moons to appear in the sky — reality doubled, unstable, bleeding at the edges where simulation meets world.</p>
+      </div>
     </div>
-    <div class="video-caption">SETTING — Isolated. Timeless. Suspended.</div>
     <div class="pill-row" style="margin-top:14px">
-      <div class="pill green">Confusion</div>
+      <div class="pill green">Isolation</div>
       <div class="pill green">Repetition</div>
-      <div class="pill green">Disconnection</div>
+      <div class="pill green">Unreality</div>
     </div>`
   },
 
   // 8 – MOREL THEME (JAZ)
-  { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'quote',
+  { section:'The Invention of Morel', person:'Jaz', type:'quote',
     html:`
     <div class="section-badge">Theme · Slide 09</div>
     <div class="big-quote">
       "Illusion replaces reality.<br>Memory dominates experience."
-      <cite>— CORE THEMES</cite>
+      <cite>— THE INVENTION OF MOREL</cite>
     </div>
     <div class="divider"></div>
     <div class="body-text" style="text-align:left;max-width:560px">
@@ -905,7 +979,7 @@ const slides = [
   },
 
   // 9 – MOREL CHARACTERS (JAZ)
-  { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'compare',
+  { section:'The Invention of Morel', person:'Jaz', type:'compare',
     html:`
     <div class="section-badge">Characters · Slide 10</div>
     <div class="slide-title">Characters</div>
@@ -919,7 +993,7 @@ const slides = [
   },
 
   // 10 – TECHNOLOGY
-  { section:'The Invention of Morel', person:'Person 3', type:'terminal',
+  { section:'The Invention of Morel', person:'Mariah', type:'terminal',
     html:`
     <div class="section-badge">Technology · Slide 11</div>
     <div class="slide-title">Morel's Machine</div>
@@ -944,21 +1018,33 @@ const slides = [
   },
 
   // 11 – MOREL SYMBOLISM
-  { section:'The Invention of Morel', person:'Person 3', type:'compare',
+  { section:'The Invention of Morel', person:'Mariah', type:'compare',
     html:`
     <div class="section-badge">Symbolism · Slide 12</div>
     <div class="slide-title">Symbolism</div>
     <div class="divider"></div>
-    <div class="compare-grid">
-      <div class="cbox"><h4>Morel's Machine</h4><p>Symbol of artificial existence. Technology that simulates life perfectly — but at the cost of life itself. Creation becomes destruction.</p></div>
-      <div class="cbox"><h4>The Island</h4><p>Symbol of total isolation — a world apart. Rules of reality suspended. The island is not a place: it is a state of mind.</p></div>
-      <div class="cbox"><h4>The Loop</h4><p>Symbol of memory dominating the present. The eternal return of a single perfect week — beauty frozen into repetition, stripped of meaning.</p></div>
-      <div class="cbox"><h4>The Two Suns</h4><p>Symbol of doubled reality — the real world and its simulation bleeding into each other. Neither can coexist safely with the other.</p></div>
+    <div class="sym-list">
+      <div class="sym-item">
+        <div class="sym-glyph">⚙</div>
+        <div class="sym-body"><h5>Morel's Machine</h5><p>Technology that simulates life perfectly — at the cost of life itself. The instrument of creation is also the instrument of death.</p></div>
+      </div>
+      <div class="sym-item">
+        <div class="sym-glyph">◈</div>
+        <div class="sym-body"><h5>The Island</h5><p>Total isolation — rules of reality suspended. Not a place but a state of mind: cut off from anything that might challenge the illusion.</p></div>
+      </div>
+      <div class="sym-item">
+        <div class="sym-glyph">∞</div>
+        <div class="sym-body"><h5>The Loop</h5><p>Memory dominating the present. A single perfect week repeated forever — beauty frozen into repetition, drained of meaning over time.</p></div>
+      </div>
+      <div class="sym-item">
+        <div class="sym-glyph">☉</div>
+        <div class="sym-body"><h5>The Two Suns</h5><p>Doubled reality — the real world and its simulation bleeding together at the edges. Neither can coexist safely with the other.</p></div>
+      </div>
     </div>`
   },
 
   // 12 – MATRIX INTRO
-  { section:'The Matrix', person:'Person 3', type:'intro',
+  { section:'The Matrix', person:'Mariah', type:'intro',
     html:`
     <div class="section-badge">The Matrix · Slide 13</div>
     <div class="slide-title"><span class="glitch" data-text="WELCOME TO THE MATRIX">WELCOME TO THE MATRIX</span></div>
@@ -973,33 +1059,38 @@ const slides = [
   },
 
   // 13 – WACHOWSKIS
-  { section:'The Matrix', person:'Person 3', type:'terminal',
+  { section:'The Matrix', person:'Mariah', type:'terminal',
     html:`
     <div class="section-badge">Directors · Slide 14</div>
     <div class="slide-title">The Wachowskis</div>
     <div class="divider"></div>
-    <div class="terminal">
-      <div class="terminal-bar">
-        <div class="tbar-dot" style="background:#ff5f57"></div>
-        <div class="tbar-dot" style="background:#ffbd2e"></div>
-        <div class="tbar-dot" style="background:#28ca41"></div>
-        <span style="font-size:10px;color:rgba(0,255,65,.3);margin-left:8px">directors.exe</span>
-      </div>
-      <div class="terminal-body">
-        <div><span class="t-prompt">root@matrix:~$ </span><span class="t-cmd">query --director wachowskis</span></div>
-        <div class="t-out">LANA WACHOWSKI · LILLY WACHOWSKI</div>
-        <div class="t-out">ORIGIN: Chicago, Illinois, USA</div>
-        <div class="t-out">INFLUENCES: Baudrillard · Descartes · Plato</div>
-        <div class="t-out">INFLUENCES: Ghost in the Shell · Neuromancer</div>
-        <div class="t-out">TRILOGY: The Matrix · Reloaded · Revolutions</div>
-        <div class="t-out">LEGACY: Redefined science-fiction cinema</div>
-        <div><span class="t-prompt">root@matrix:~$ </span><span class="t-cursor"></span></div>
+    <div style="display:flex;gap:20px;align-items:flex-start;width:100%;max-width:680px">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Lana_and_Lilly_Wachowski.jpg"
+           alt="Lana and Lilly Wachowski"
+           style="height:180px;width:auto;flex-shrink:0;border:1px solid rgba(0,255,65,.3);box-shadow:0 0 20px rgba(0,255,65,.12)">
+      <div class="terminal" style="flex:1;min-width:0">
+        <div class="terminal-bar">
+          <div class="tbar-dot" style="background:#ff5f57"></div>
+          <div class="tbar-dot" style="background:#ffbd2e"></div>
+          <div class="tbar-dot" style="background:#28ca41"></div>
+          <span style="font-size:10px;color:rgba(0,255,65,.3);margin-left:8px">directors.exe</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-prompt">root@matrix:~$ </span><span class="t-cmd">query --director wachowskis</span></div>
+          <div class="t-out">LANA WACHOWSKI · LILLY WACHOWSKI</div>
+          <div class="t-out">ORIGIN: Chicago, Illinois, USA</div>
+          <div class="t-out">INFLUENCES: Baudrillard · Descartes · Plato</div>
+          <div class="t-out">INFLUENCES: Ghost in the Shell · Neuromancer</div>
+          <div class="t-out">TRILOGY: The Matrix · Reloaded · Revolutions</div>
+          <div class="t-out">LEGACY: Redefined science-fiction cinema</div>
+          <div><span class="t-prompt">root@matrix:~$ </span><span class="t-cursor"></span></div>
+        </div>
       </div>
     </div>`
   },
 
   // 14 – MATRIX BACKGROUND (Person 1)
-  { section:'The Matrix', person:'Person 1', type:'stats',
+  { section:'The Matrix', person:'Samarth', type:'stats',
     html:`
     <div class="section-badge">Background · Slide 15</div>
     <div class="slide-title">Background of The Matrix</div>
@@ -1018,40 +1109,55 @@ const slides = [
   },
 
   // 15 – MATRIX PLOT (Person 1)
-  { section:'The Matrix', person:'Person 1', type:'timeline',
+  { section:'The Matrix', person:'Samarth', type:'timeline',
     html:`
     <div class="section-badge">Plot · Slide 16</div>
     <div class="slide-title">Plot</div>
     <div class="divider"></div>
-    <div class="timeline">
-      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Programmer</h5><p>Thomas A. Anderson — "Neo" — a hacker who suspects something is fundamentally wrong with reality.</p></div></div>
-      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Contact</h5><p>Morpheus reaches Neo. The world he knows is not real — it is a simulation called the Matrix.</p></div></div>
-      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Choice</h5><p>Red pill or blue pill. Neo takes the red — and wakes into the devastated real world of 2199.</p></div></div>
-      <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Fight</h5><p>Neo discovers he is "The One" — capable of bending the simulation's rules — and leads humanity's resistance.</p></div></div>
+    <div style="display:flex;gap:24px;align-items:center;width:100%;max-width:760px">
+      <div class="timeline" style="flex:1">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Programmer</h5><p>Thomas A. Anderson — "Neo" — a hacker who suspects something is fundamentally wrong with reality.</p></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Contact</h5><p>Morpheus reaches Neo. The world he knows is not real — it is a simulation called the Matrix.</p></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Choice</h5><p>Red pill or blue pill. Neo takes the red — and wakes into the devastated real world of 2199.</p></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Fight</h5><p>Neo discovers he is "The One" — capable of bending the simulation's rules — and leads humanity's resistance.</p></div></div>
+      </div>
+      <div style="flex:0 0 200px;display:flex;flex-direction:column;align-items:center;gap:10px">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Red_or_blue_pill.svg"
+             alt="Red pill or blue pill"
+             style="width:100%;opacity:.9">
+        <span style="font-size:9px;letter-spacing:3px;color:rgba(0,255,65,.35)">THE CHOICE</span>
+      </div>
     </div>`
   },
 
   // 16 – MATRIX SETTING (JAZ)
-  { section:'The Matrix', person:'Person 2 — JAZ', type:'compare',
+  { section:'The Matrix', person:'Jaz', type:'compare',
     html:`
     <div class="section-badge">Setting · Slide 17</div>
     <div class="slide-title">Two Worlds</div>
     <div class="divider"></div>
-    <div class="compare-grid">
-      <div class="cbox" style="border-color:rgba(0,102,255,.3)"><h4 style="color:#0099ff">The Matrix</h4><p>Simulated 1999. Clean streets, ordinary life, warm light. A constructed comfort designed to keep humans passive, harvested, controlled.</p></div>
-      <div class="cbox" style="border-color:rgba(255,100,0,.3)"><h4 style="color:#ff6600">The Real World</h4><p>Year ~2199. Sky scorched. Earth desolate. Machine fields harvest humans like crops. Cold, dark, brutally real — and free.</p></div>
+    <div class="world-split" style="display:grid;grid-template-columns:1fr 1fr;gap:0;width:100%;max-width:700px;border:1px solid rgba(0,255,65,.12)">
+      <div class="world-sim" style="padding:28px 24px;background:linear-gradient(135deg,rgba(0,60,180,.12),transparent);border-right:1px solid rgba(0,255,65,.1)">
+        <div style="font-family:'Orbitron',sans-serif;font-size:clamp(13px,2.2vw,20px);font-weight:900;letter-spacing:3px;color:#4499ff;text-shadow:0 0 18px rgba(0,100,255,.5);margin-bottom:12px">THE MATRIX</div>
+        <p style="font-size:12px;color:var(--green-dim);line-height:1.75">Simulated 1999. Clean streets, ordinary life, warm light. A constructed comfort designed to keep humans passive, harvested, controlled.</p>
+        <div style="margin-top:14px;font-size:9px;letter-spacing:2px;color:rgba(80,150,255,.5)">COMFORTABLE · FABRICATED · ENSLAVED</div>
+      </div>
+      <div style="padding:28px 24px;background:linear-gradient(135deg,rgba(200,70,0,.09),transparent)">
+        <div style="font-family:'Orbitron',sans-serif;font-size:clamp(13px,2.2vw,20px);font-weight:900;letter-spacing:3px;color:#ff8844;text-shadow:0 0 18px rgba(255,100,0,.5);margin-bottom:12px">THE REAL WORLD</div>
+        <p style="font-size:12px;color:var(--green-dim);line-height:1.75">Year ~2199. Sky scorched. Earth desolate. Machine fields harvest humans like crops. Cold, dark, brutally real — and free.</p>
+        <div style="margin-top:14px;font-size:9px;letter-spacing:2px;color:rgba(255,130,0,.5)">BRUTAL · AUTHENTIC · FREE</div>
+      </div>
     </div>
-    <div class="divider"></div>
-    <div class="body-text">The simulation is <b>more livable</b>. The real is <b>more real</b>. That tension is the entire film.</div>`
+    <div class="body-text" style="margin-top:16px">The simulation is <b>more livable</b>. The real is <b>more real</b>. That tension is the entire film.</div>`
   },
 
   // 17 – MATRIX THEME
-  { section:'The Matrix', person:'Person 3', type:'quote',
+  { section:'The Matrix', person:'Mariah', type:'quote',
     html:`
     <div class="section-badge">Theme · Slide 18</div>
     <div class="big-quote">
       "Reality is constructed.<br>Truth requires the courage to look."
-      <cite>— CORE THEMES</cite>
+      <cite>— THE MATRIX</cite>
     </div>
     <div class="divider"></div>
     <div class="body-text" style="text-align:left;max-width:560px">
@@ -1063,7 +1169,7 @@ const slides = [
   },
 
   // 18 – MATRIX CHARACTERS
-  { section:'The Matrix', person:'Person 3', type:'compare',
+  { section:'The Matrix', person:'Mariah', type:'compare',
     html:`
     <div class="section-badge">Characters · Slide 19</div>
     <div class="slide-title">Characters</div>
@@ -1077,7 +1183,7 @@ const slides = [
   },
 
   // 19 – MATRIX TECHNOLOGY
-  { section:'The Matrix', person:'Person 3', type:'terminal',
+  { section:'The Matrix', person:'Mariah', type:'terminal',
     html:`
     <div class="section-badge">Technology · Slide 20</div>
     <div class="slide-title">The Simulation</div>
@@ -1103,30 +1209,61 @@ const slides = [
   },
 
   // 20 – MATRIX SYMBOLISM (JAZ)
-  { section:'The Matrix', person:'Person 2 — JAZ', type:'default',
+  { section:'The Matrix', person:'Jaz', type:'default',
     html:`
     <div class="section-badge">Symbolism · Slide 21</div>
     <div class="slide-title">The Pill Choice</div>
     <div class="divider"></div>
-    <div class="pill-row">
-      <div class="pill red">RED PILL — TRUTH</div>
-      <div style="font-family:Orbitron,sans-serif;font-size:16px;color:rgba(0,255,65,.3);align-self:center">VS</div>
-      <div class="pill blue">BLUE PILL — BLISS</div>
+    <div class="compare-grid">
+      <div class="cbox" style="border-color:rgba(255,0,51,.35)">
+        <h4 style="color:#ff4444">Red Pill — Truth</h4>
+        <p>Neo wakes in the real world: a devastated future where humanity is harvested as a battery crop. The illusion is destroyed forever. There is no going back.</p>
+        <p style="margin-top:10px;font-size:11px;color:rgba(255,80,80,.7);letter-spacing:1px">IRREVERSIBLE · BRUTAL · FREE</p>
+      </div>
+      <div class="cbox" style="border-color:rgba(0,102,255,.35)">
+        <h4 style="color:#4499ff">Blue Pill — Bliss</h4>
+        <p>Neo returns to his ordinary life as Thomas Anderson. He remembers nothing. The simulation continues. Comfort is preserved — and so is the cage.</p>
+        <p style="margin-top:10px;font-size:11px;color:rgba(80,150,255,.7);letter-spacing:1px">COMFORTABLE · HOLLOW · ENSLAVED</p>
+      </div>
     </div>
     <div class="divider"></div>
     <div class="body-text">
-      The most iconic binary choice in modern cinema.<br><br>
-      The pills encode the film's entire philosophical question:<br>
-      <b>Is it better to know a painful truth,</b> or live comfortably<br>
-      inside a beautiful lie?<br><br>
-      <em>The choice is irrevocable. There is no going back.</em>
+      Morpheus frames it plainly: <em>"You take the blue pill — the story ends. You take the red pill — you stay in Wonderland, and I show you how deep the rabbit hole goes."</em><br><br>
+      The choice is not between two options — it is between <b>two philosophies of existence</b>. Neo chooses the red pill. He chooses truth at the cost of everything he has ever known.
+    </div>
+    <div class="pill-row" style="margin-top:14px">
+      <div class="pill red">RED PILL — TRUTH</div>
+      <div style="font-family:Orbitron,sans-serif;font-size:16px;color:rgba(0,255,65,.3);align-self:center">VS</div>
+      <div class="pill blue">BLUE PILL — BLISS</div>
+    </div>`
+  },
+
+  // 20b – PILL SCENE VIDEO (JAZ)
+  { section:'The Matrix', person:'Jaz', type:'default',
+    html:`
+    <div class="section-badge">Symbolism · Slide 22</div>
+    <div class="slide-title">The Scene</div>
+    <div class="divider"></div>
+    <a href="https://www.youtube.com/watch?v=fnVQlwKAuLk" target="_blank" rel="noopener" style="display:block;max-width:560px;margin:0 auto;text-decoration:none;position:relative;cursor:pointer">
+      <img src="https://img.youtube.com/vi/fnVQlwKAuLk/maxresdefault.jpg" alt="The Matrix pill scene" style="width:100%;border:1px solid rgba(0,255,65,.25);border-radius:4px;display:block">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35)">
+        <div style="width:68px;height:48px;background:#ff0000;border-radius:12px;display:flex;align-items:center;justify-content:center">
+          <div style="width:0;height:0;border-style:solid;border-width:10px 0 10px 20px;border-color:transparent transparent transparent #fff;margin-left:4px"></div>
+        </div>
+      </div>
+    </a>
+    <div class="video-caption" style="margin-top:8px">THE MATRIX (1999) — The Red Pill / Blue Pill Scene &nbsp;↗ Opens YouTube</div>
+    <div class="pill-row" style="margin-top:14px">
+      <div class="pill red">RED PILL — TRUTH</div>
+      <div style="font-family:Orbitron,sans-serif;font-size:16px;color:rgba(0,255,65,.3);align-self:center">VS</div>
+      <div class="pill blue">BLUE PILL — BLISS</div>
     </div>`
   },
 
   // 21 – COMPARE INTRO
-  { section:'Comparing the Two', person:'Person 3', type:'intro',
+  { section:'Comparing the Two', person:'Mariah', type:'intro',
     html:`
-    <div class="section-badge">Comparison · Slide 22</div>
+    <div class="section-badge">Comparison · Slide 23</div>
     <div class="slide-title"><span class="glitch" data-text="COMPARING THE TWO">COMPARING THE TWO</span></div>
     <div class="divider"></div>
     <div class="body-text">
@@ -1138,29 +1275,30 @@ const slides = [
   },
 
   // 22 – THEME COMPARE (Person 1)
-  { section:'Comparing the Two', person:'Person 1', type:'compare',
+  { section:'Comparing the Two', person:'Samarth', type:'compare',
     html:`
-    <div class="section-badge">Theme Comparison · Slide 23</div>
+    <div class="section-badge">Theme Comparison · Slide 24</div>
     <div class="slide-title">Theme</div>
     <div class="divider"></div>
-    <div class="compare-grid">
-      <div class="cbox" style="border-color:rgba(0,255,65,.35)">
-        <h4>Morel — Acceptance</h4>
-        <p>The narrator willingly surrenders to illusion. Love inside a constructed world is sufficient. He does not fight the machine — he joins it.</p>
+    <div class="philosophy-split" style="display:grid;grid-template-columns:1fr 1fr;gap:0;width:100%;max-width:700px">
+      <div style="padding:32px 28px;background:rgba(0,255,65,.04);border:1px solid rgba(0,255,65,.22);border-right:none;text-align:center">
+        <div style="font-family:'Orbitron',sans-serif;font-size:clamp(14px,2.8vw,26px);font-weight:900;letter-spacing:3px;color:var(--green);margin-bottom:8px">ACCEPTANCE</div>
+        <div style="font-size:9px;letter-spacing:3px;color:rgba(0,255,65,.35);margin-bottom:16px;text-transform:uppercase">Morel</div>
+        <p style="font-size:12px;color:var(--green-dim);line-height:1.75;text-align:left">The narrator willingly surrenders to illusion. Love inside a constructed world is sufficient. He does not fight the machine — he joins it.</p>
       </div>
-      <div class="cbox" style="border-color:rgba(255,0,51,.3)">
-        <h4 style="color:#ff4444">Matrix — Resistance</h4>
-        <p>Neo rejects simulation at every level. A comfortable lie is still a lie. Truth — however brutal — is the only foundation for a meaningful life.</p>
+      <div class="phil-resist" style="padding:32px 28px;background:rgba(255,0,51,.03);border:1px solid rgba(255,0,51,.22);text-align:center">
+        <div style="font-family:'Orbitron',sans-serif;font-size:clamp(14px,2.8vw,26px);font-weight:900;letter-spacing:3px;color:#ff4444;margin-bottom:8px">RESISTANCE</div>
+        <div style="font-size:9px;letter-spacing:3px;color:rgba(255,0,51,.35);margin-bottom:16px;text-transform:uppercase">Matrix</div>
+        <p style="font-size:12px;color:var(--green-dim);line-height:1.75;text-align:left">Neo rejects simulation at every level. A comfortable lie is still a lie. Truth — however brutal — is the only foundation for a meaningful life.</p>
       </div>
     </div>
-    <div class="divider"></div>
-    <div class="body-text"><em>Two philosophies. Two answers to the same trap.</em></div>`
+    <div class="body-text" style="margin-top:16px"><em>Two philosophies. Two answers to the same trap.</em></div>`
   },
 
   // 23 – CHARACTER COMPARE (JAZ)
-  { section:'Comparing the Two', person:'Person 2 — JAZ', type:'compare',
+  { section:'Comparing the Two', person:'Jaz', type:'compare',
     html:`
-    <div class="section-badge">Character Comparison · Slide 24</div>
+    <div class="section-badge">Character Comparison · Slide 25</div>
     <div class="slide-title">The Narrator vs. Neo</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -1184,29 +1322,54 @@ const slides = [
   },
 
   // 24 – TECHNOLOGY COMPARE (JAZ)
-  { section:'Comparing the Two', person:'Person 2 — JAZ', type:'compare',
+  { section:'Comparing the Two', person:'Jaz', type:'compare',
     html:`
-    <div class="section-badge">Technology Comparison · Slide 25</div>
+    <div class="section-badge">Technology Comparison · Slide 26</div>
     <div class="slide-title">Technology: Both Replace Reality</div>
     <div class="divider"></div>
-    <div class="compare-grid">
-      <div class="cbox">
-        <h4>Morel's Machine</h4>
-        <p>Scale: one island. Subjects: a small group. Operator: one inventor driven by obsession. The technology is intimate — personal — tragic.</p>
-      </div>
-      <div class="cbox">
-        <h4>The Matrix</h4>
-        <p>Scale: an entire planet. Subjects: billions. Operator: a machine civilization. The technology is industrial — systemic — genocidal.</p>
-      </div>
-    </div>
-    <div class="divider"></div>
-    <div class="body-text"><b>Common thread:</b> Both technologies produce simulations indistinguishable from reality for those inside them. Both kill. Both are driven by a purpose beyond the subjects' awareness or consent.</div>`
+    <table style="width:100%;max-width:640px;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:9px 14px;border-bottom:1px solid rgba(0,255,65,.2);font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(0,255,65,.4);font-weight:400"></th>
+          <th style="text-align:left;padding:9px 14px;border-bottom:1px solid rgba(0,255,65,.2);font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:var(--green);font-weight:400">MOREL'S MACHINE</th>
+          <th style="text-align:left;padding:9px 14px;border-bottom:1px solid rgba(0,255,65,.2);font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:#ff5555;font-weight:400">THE MATRIX</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(0,255,65,.06)">
+          <td style="padding:9px 14px;color:rgba(0,255,65,.4);font-size:9px;letter-spacing:1px">SCALE</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">One island</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">An entire planet</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(0,255,65,.06)">
+          <td style="padding:9px 14px;color:rgba(0,255,65,.4);font-size:9px;letter-spacing:1px">SUBJECTS</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">A small group</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">7.9 billion humans</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(0,255,65,.06)">
+          <td style="padding:9px 14px;color:rgba(0,255,65,.4);font-size:9px;letter-spacing:1px">OPERATOR</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">One inventor, obsession</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">Machine civilization</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(0,255,65,.06)">
+          <td style="padding:9px 14px;color:rgba(0,255,65,.4);font-size:9px;letter-spacing:1px">TONE</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">Intimate · tragic</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">Industrial · genocidal</td>
+        </tr>
+        <tr>
+          <td style="padding:9px 14px;color:rgba(0,255,65,.4);font-size:9px;letter-spacing:1px">COST</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">Fatal to subjects</td>
+          <td style="padding:9px 14px;color:var(--green-dim)">All of human existence</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="body-text" style="margin-top:14px"><b>Common thread:</b> Both produce simulations indistinguishable from reality — both kill — both operate beyond the subjects' consent.</div>`
   },
 
   // 25 – SYMBOLISM COMPARE
-  { section:'Comparing the Two', person:'Person 3', type:'compare',
+  { section:'Comparing the Two', person:'Mariah', type:'compare',
     html:`
-    <div class="section-badge">Symbolism Comparison · Slide 26</div>
+    <div class="section-badge">Symbolism Comparison · Slide 27</div>
     <div class="slide-title">Symbolism</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -1218,30 +1381,41 @@ const slides = [
   },
 
   // 26 – OVERALL COMPARE (Person 1)
-  { section:'Comparing the Two', person:'Person 1', type:'compare',
+  { section:'Comparing the Two', person:'Samarth', type:'compare',
     html:`
-    <div class="section-badge">Overall Comparison · Slide 27</div>
+    <div class="section-badge">Overall Comparison · Slide 28</div>
     <div class="slide-title">Overall Comparison</div>
     <div class="divider"></div>
     <div class="compare-grid">
       <div class="cbox" style="border-color:rgba(0,255,65,.3)">
         <h4>Similarities</h4>
-        <p>Technology creates false reality. Characters face profound identity crises. The constructed world is indistinguishable from reality to those within it. Both involve a conscious choice about illusion.</p>
+        <p>Technology creates false reality. Characters face profound identity crises. The constructed world is indistinguishable from reality. Both involve a conscious choice about illusion.</p>
       </div>
       <div class="cbox" style="border-color:rgba(255,165,0,.25)">
         <h4>Differences</h4>
-        <p>Scale: intimate vs planetary. Medium: literary novella vs blockbuster film. Resolution: acceptance vs resistance. Tone: melancholic vs heroic. Era: 1940 vs 1999.</p>
+        <p>Scale: intimate vs planetary. Medium: novella vs blockbuster film. Resolution: acceptance vs resistance. Tone: melancholic vs heroic. Era: 1940 vs 1999.</p>
       </div>
     </div>
-    <div class="video-frame" style="max-width:480px;margin-top:16px">
-      <iframe src="https://www.youtube.com/embed/vKQi3bBA1y8?autoplay=0&modestbranding=1&rel=0" allowfullscreen title="Matrix Morpheus red pill scene"></iframe>
-    </div>`
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0;width:100%;max-width:720px;margin-top:14px;border:1px solid rgba(0,255,65,.1)">
+      <div style="padding:14px 20px;text-align:center">
+        <div style="font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:var(--green);margin-bottom:5px">MOREL</div>
+        <div style="font-size:11px;color:var(--green-dim)">Embrace illusion</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;padding:14px 18px;border-left:1px solid rgba(0,255,65,.1);border-right:1px solid rgba(0,255,65,.1)">
+        <span style="font-family:'Orbitron',sans-serif;font-size:16px;color:rgba(0,255,65,.3)">VS</span>
+      </div>
+      <div style="padding:14px 20px;text-align:center">
+        <div style="font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:#ff4444;margin-bottom:5px">MATRIX</div>
+        <div style="font-size:11px;color:var(--green-dim)">Reject illusion</div>
+      </div>
+    </div>
+`
   },
 
   // 27 – CONCLUSION (Person 1)
-  { section:'Conclusion', person:'Person 1', type:'quote',
+  { section:'Conclusion', person:'Samarth', type:'quote',
     html:`
-    <div class="section-badge">Conclusion · Slide 28</div>
+    <div class="section-badge">Conclusion · Slide 29</div>
     <div class="slide-title">Conclusion</div>
     <div class="divider"></div>
     <div class="big-quote">
@@ -1258,9 +1432,9 @@ const slides = [
   },
 
   // 28 – Q&A (JAZ)
-  { section:'Conclusion', person:'Person 2 — JAZ', type:'qa',
+  { section:'Conclusion', person:'Jaz', type:'qa',
     html:`
-    <div class="section-badge">Discussion · Slide 29</div>
+    <div class="section-badge">Discussion · Slide 30</div>
     <div class="slide-title">Questions & Discussion</div>
     <div class="divider"></div>
     <div class="qa-grid">
@@ -1272,9 +1446,9 @@ const slides = [
   },
 
   // 29 – THANK YOU (Person 3)
-  { section:'Conclusion', person:'Person 3', type:'ty',
+  { section:'Conclusion', person:'Mariah', type:'ty',
     html:`
-    <div class="section-badge">Thank You · Slide 30</div>
+    <div class="section-badge">Thank You · Slide 31</div>
     <div class="ty-glyph">ありがとう</div>
     <div class="slide-title" style="margin-top:16px;font-size:clamp(16px,2.5vw,24px)">Thank You</div>
     <div class="divider"></div>
@@ -1283,7 +1457,7 @@ const slides = [
       This presentation explored reality, illusion, and identity<br>
       through <b>The Invention of Morel</b> (Bioy Casares, 1940)<br>
       and <b>The Matrix</b> (The Wachowskis, 1999).<br><br>
-      <span style="color:rgba(0,255,65,.3);font-size:11px;letter-spacing:3px">PERSON 1 &nbsp;·&nbsp; PERSON 2 — JAZ &nbsp;·&nbsp; PERSON 3</span>
+      <span style="color:rgba(0,255,65,.3);font-size:11px;letter-spacing:3px">SAMARTH &nbsp;·&nbsp; JAZ &nbsp;·&nbsp; MARIAH</span>
     </div>
     <div style="margin-top:20px;font-size:10px;color:rgba(0,255,65,.2);letter-spacing:2px">
       ↓ &nbsp; CLICK "CHOOSE YOUR REALITY" TO ACTIVATE THE EASTER EGG &nbsp; ↓
@@ -1295,6 +1469,14 @@ const slides = [
 let current = 0;
 let isTransitioning = false;
 const area = document.getElementById('slide-area');
+
+// Section index for segment nav
+const sections = [];
+slides.forEach((s, i) => {
+  const last = sections[sections.length - 1];
+  if (!last || last.name !== s.section) sections.push({name: s.section, start: i, count: 1});
+  else last.count++;
+});
 
 function buildSlides() {
   slides.forEach((s, i) => {
@@ -1313,13 +1495,22 @@ function buildSlides() {
 
 function buildDots() {
   const wrap = document.getElementById('dots-wrap');
+  const label = document.getElementById('snav-label');
   wrap.innerHTML = '';
-  slides.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i === current ? ' active' : '');
-    d.onclick = () => goTo(i);
-    wrap.appendChild(d);
+  sections.forEach(sec => {
+    const btn = document.createElement('button');
+    const isActive = current >= sec.start && current < sec.start + sec.count;
+    const isPast   = current >= sec.start + sec.count;
+    btn.className = 'snav-item' + (isActive ? ' active' : isPast ? ' past' : '');
+    btn.style.flex = String(sec.count);
+    btn.title = sec.name;
+    btn.onclick = () => goTo(sec.start);
+    wrap.appendChild(btn);
   });
+  if (label) {
+    const activeSec = sections.find(s => current >= s.start && current < s.start + s.count);
+    label.textContent = activeSec ? activeSec.name.toUpperCase() : '';
+  }
 }
 
 function updateUI() {
@@ -1329,7 +1520,6 @@ function updateUI() {
     ((current + 1) / slides.length * 100) + '%';
   document.getElementById('prev-btn').disabled = current === 0;
   document.getElementById('next-btn').disabled = current === slides.length - 1;
-  document.getElementById('person-nav').textContent = slides[current].person;
   buildDots();
 }
 
