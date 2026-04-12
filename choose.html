@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choose Your Reality</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00ff41;
+  --green-dim: #00cc34;
+  --red: #ff0033;
+  --blue: #0066ff;
+  --scanline: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(0, 255, 65, 0.08), transparent 35%),
+    radial-gradient(circle at bottom, rgba(255, 0, 51, 0.08), transparent 28%),
+    #000;
+  color: var(--green);
+  font-family: 'Share Tech Mono', monospace;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--scanline);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(0,255,65,0.04) 1px, transparent 1px),
+    linear-gradient(rgba(0,255,65,0.04) 1px, transparent 1px);
+  background-size: 42px 42px;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.shell {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 88px 24px 32px;
+}
+
+.back-link {
+  position: fixed;
+  top: 22px;
+  left: 22px;
+  z-index: 2;
+  border: 1px solid rgba(0,255,65,.28);
+  color: rgba(0,255,65,.72);
+  text-decoration: none;
+  padding: 10px 16px;
+  letter-spacing: 2px;
+  font-size: 11px;
+  background: rgba(0,0,0,.78);
+  backdrop-filter: blur(6px);
+  transition: all .2s;
+}
+
+.back-link:hover {
+  color: var(--green);
+  border-color: var(--green);
+  background: rgba(0,255,65,.08);
+}
+
+.panel {
+  position: relative;
+  width: min(880px, 100%);
+  border: 1px solid rgba(0,255,65,.18);
+  background: rgba(0,0,0,.76);
+  box-shadow: 0 0 60px rgba(0,255,65,.08);
+  padding: 48px 28px 34px;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: rgba(0,255,65,.45);
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(22px, 4vw, 44px);
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-shadow: 0 0 28px rgba(0,255,65,.35);
+  margin-bottom: 18px;
+}
+
+.subtitle {
+  max-width: 560px;
+  margin: 0 auto 34px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: rgba(0,255,65,.56);
+}
+
+.choice-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pill-choices {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 56px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.choice-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.choice-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+}
+
+.choice-label.red { color: rgba(255,0,51,.6); }
+.choice-label.blue { color: rgba(0,102,255,.72); }
+
+.versus {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  color: rgba(0,255,65,.34);
+}
+
+.pill-btn {
+  width: 170px;
+  height: 72px;
+  border-radius: 999px;
+  border: none;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  color: #fff;
+  text-transform: uppercase;
+  transition: transform .2s, box-shadow .3s;
+}
+
+.pill-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+
+.pill-btn.red {
+  background: radial-gradient(ellipse at 40% 35%, #ff6666, #cc0022, #660011);
+  box-shadow: 0 0 36px rgba(255,0,51,.42);
+}
+
+.pill-btn.blue {
+  background: radial-gradient(ellipse at 40% 35%, #66aaff, #0044cc, #001166);
+  box-shadow: 0 0 36px rgba(0,102,255,.42);
+}
+
+.quote {
+  max-width: 420px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: rgba(0,255,65,.28);
+}
+
+.face-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.face-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255,0,51,.72);
+  animation: flicker 3s infinite;
+}
+
+#uncanny-face {
+  width: 220px;
+  height: 220px;
+}
+
+.face-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 20px rgba(255,0,51,.6));
+  animation: facePulse 2s ease-in-out infinite, faceGlitch 6s infinite;
+}
+
+.eye-left, .eye-right { animation: eyeBlink 4s ease-in-out infinite; }
+.pupil-left, .pupil-right { animation: eyeMove 5s ease-in-out infinite; }
+.mouth-path { animation: mouthMove 3s ease-in-out infinite; }
+
+#ai-speech {
+  max-width: 360px;
+  border: 1px solid rgba(255,0,51,.25);
+  background: rgba(255,0,0,.04);
+  padding: 16px 18px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #cc3333;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: middle;
+  animation: blink .8s step-end infinite;
+}
+
+.action-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.action-btn {
+  border: 1px solid rgba(0,255,65,.24);
+  color: rgba(0,255,65,.72);
+  background: transparent;
+  text-decoration: none;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.action-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(0,255,65,.08);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes facePulse {
+  0%, 100% { filter: drop-shadow(0 0 20px rgba(255,0,51,.6)); }
+  50% { filter: drop-shadow(0 0 40px rgba(255,0,51,.9)); }
+}
+
+@keyframes faceGlitch {
+  0%, 85%, 100% { transform: none; }
+  86% { transform: translate(3px, -2px) scaleX(1.02); }
+  87% { transform: translate(-3px, 1px) scaleX(0.98); }
+  88% { transform: none; }
+  95% { transform: translate(0, 2px); }
+  96% { transform: none; }
+}
+
+@keyframes eyeBlink {
+  0%, 45%, 55%, 100% { transform: scaleY(1) translateY(0); }
+  47%, 53% { transform: scaleY(0.05) translateY(3px); }
+}
+
+@keyframes eyeMove {
+  0%, 100% { transform: translate(0,0); }
+  20% { transform: translate(4px,-2px); }
+  40% { transform: translate(-3px,3px); }
+  60% { transform: translate(5px,1px); }
+  80% { transform: translate(-2px,-3px); }
+}
+
+@keyframes mouthMove {
+  0%, 100% { d: path('M 75 148 Q 110 168 145 148'); }
+  40% { d: path('M 75 155 Q 110 140 145 155'); }
+  70% { d: path('M 72 150 Q 110 178 148 150'); }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: .7; }
+  45% { opacity: .9; }
+  46% { opacity: .2; }
+  47% { opacity: .8; }
+  90% { opacity: .7; }
+  91% { opacity: .15; }
+  92% { opacity: .7; }
+}
+
+@media (max-width: 640px) {
+  .shell { padding-top: 96px; }
+  .panel { padding: 42px 18px 28px; }
+  .pill-choices { gap: 24px; }
+  .versus { width: 100%; }
+  .back-link { left: 16px; right: 16px; text-align: center; }
+}
+</style>
+</head>
+<body>
+<a class="back-link" href="/">BACK TO PRESENTATION</a>
+
+<main class="shell">
+  <section class="panel">
+    <div id="choice-scene" class="choice-scene">
+      <div class="eyebrow">Alternate Route</div>
+      <h1 class="title">Choose Your Reality</h1>
+      <p class="subtitle">
+        This easter egg now lives on its own route. Make your choice, inspect the response,
+        then use the persistent back link to return to the main presentation.
+      </p>
+
+      <div class="pill-choices">
+        <div class="choice-col">
+          <button class="pill-btn red" type="button" onclick="choosePill('red')">Red Pill</button>
+          <span class="choice-label red">Truth</span>
+        </div>
+        <div class="versus">VS</div>
+        <div class="choice-col">
+          <button class="pill-btn blue" type="button" onclick="choosePill('blue')">Blue Pill</button>
+          <span class="choice-label blue">Bliss</span>
+        </div>
+      </div>
+
+      <p class="quote">
+        "You take the red pill - you stay in Wonderland, and I show you how deep the rabbit hole goes."
+      </p>
+    </div>
+
+    <div id="face-container" class="face-container">
+      <div class="face-title" id="face-label">System Entity - Designation: Unknown</div>
+      <div id="uncanny-face">
+        <svg class="face-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="skinGrad" cx="45%" cy="35%">
+              <stop offset="0%" stop-color="#2a1a1a"/>
+              <stop offset="100%" stop-color="#0d0505"/>
+            </radialGradient>
+            <radialGradient id="eyeGrad" cx="40%" cy="35%">
+              <stop offset="0%" stop-color="#330000"/>
+              <stop offset="60%" stop-color="#110000"/>
+              <stop offset="100%" stop-color="#000"/>
+            </radialGradient>
+            <filter id="glowRed">
+              <feGaussianBlur stdDeviation="3" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <ellipse cx="110" cy="112" rx="78" ry="90" fill="url(#skinGrad)" stroke="#1a0000" stroke-width="1"/>
+          <path d="M 98 85 Q 102 82 99 90" stroke="#1f0000" stroke-width="1.2" fill="none" opacity=".6"/>
+          <path d="M 125 88 Q 121 84 123 93" stroke="#1f0000" stroke-width="1.2" fill="none" opacity=".5"/>
+          <path d="M 100 70 Q 108 65 115 72 Q 118 68 125 70" stroke="#2a0a0a" stroke-width=".8" fill="none" opacity=".7"/>
+
+          <g class="eye-left" transform-origin="83 108">
+            <ellipse cx="83" cy="108" rx="22" ry="16" fill="#0a0000" opacity=".9"/>
+            <ellipse cx="83" cy="108" rx="16" ry="12" fill="url(#eyeGrad)"/>
+            <ellipse cx="85" cy="107" rx="9" ry="10" fill="#2b0000"/>
+            <ellipse cx="85" cy="107" rx="7" ry="8" fill="#1a0000"/>
+            <g class="pupil-left" transform-origin="85 107">
+              <ellipse cx="85" cy="107" rx="2.5" ry="6" fill="#000"/>
+              <circle cx="83" cy="104" r="2" fill="rgba(255,0,0,.15)"/>
+            </g>
+            <ellipse cx="83" cy="104" rx="4" ry="2.5" fill="rgba(255,255,255,.04)"/>
+          </g>
+          <path d="M 61 106 Q 83 93 105 107" stroke="#1a0505" stroke-width="1.5" fill="none"/>
+          <path d="M 61 110 Q 83 120 105 111" stroke="#1a0505" stroke-width="1.2" fill="none"/>
+
+          <g class="eye-right" transform-origin="137 105">
+            <ellipse cx="137" cy="105" rx="22" ry="16" fill="#0a0000" opacity=".9"/>
+            <ellipse cx="137" cy="105" rx="16" ry="12" fill="url(#eyeGrad)"/>
+            <ellipse cx="135" cy="104" rx="9" ry="10" fill="#2b0000"/>
+            <ellipse cx="135" cy="104" rx="7" ry="8" fill="#1a0000"/>
+            <g class="pupil-right" transform-origin="135 104">
+              <ellipse cx="135" cy="104" rx="2.5" ry="6" fill="#000"/>
+              <circle cx="133" cy="101" r="2" fill="rgba(255,0,0,.15)"/>
+            </g>
+            <ellipse cx="137" cy="101" rx="4" ry="2.5" fill="rgba(255,255,255,.04)"/>
+          </g>
+          <path d="M 115 103 Q 137 90 159 104" stroke="#1a0505" stroke-width="1.5" fill="none"/>
+          <path d="M 115 107 Q 137 117 159 108" stroke="#1a0505" stroke-width="1.2" fill="none"/>
+
+          <path d="M 110 118 L 106 142 Q 110 148 114 142 L 110 118" stroke="#0f0000" stroke-width="1" fill="#110000" opacity=".8"/>
+          <ellipse cx="104" cy="143" rx="5" ry="3" fill="#0d0000" opacity=".6"/>
+          <ellipse cx="116" cy="143" rx="5" ry="3" fill="#0d0000" opacity=".6"/>
+
+          <g class="mouth-path">
+            <path d="M 75 152 Q 110 170 145 152" stroke="#0a0000" stroke-width="2" fill="none"/>
+            <rect x="87" y="153" width="8" height="10" rx="1" fill="#ddd" opacity=".7" transform="rotate(-2,91,158)"/>
+            <rect x="97" y="152" width="8" height="11" rx="1" fill="#e0e0e0" opacity=".8"/>
+            <rect x="107" y="152" width="8" height="11" rx="1" fill="#dedede" opacity=".8"/>
+            <rect x="117" y="153" width="8" height="10" rx="1" fill="#ddd" opacity=".7" transform="rotate(2,121,158)"/>
+            <rect x="104" y="152" width="3" height="7" rx="1" fill="#ccc" opacity=".4"/>
+            <path d="M 87 163 Q 110 168 133 163" stroke="#0a0000" stroke-width="1.5" fill="#0a0000" opacity=".5"/>
+          </g>
+
+          <circle cx="95" cy="95" r="1" fill="rgba(30,5,5,.5)"/>
+          <circle cx="128" cy="92" r="1.2" fill="rgba(30,5,5,.4)"/>
+          <circle cx="140" cy="130" r=".8" fill="rgba(30,5,5,.5)"/>
+          <circle cx="80" cy="128" r="1" fill="rgba(30,5,5,.4)"/>
+          <path d="M 55 115 Q 68 125 75 140" stroke="#1a0000" stroke-width="1" fill="none" opacity=".4"/>
+
+          <path d="M 33 95 Q 40 30 110 22 Q 180 30 187 95 Q 170 48 110 45 Q 50 48 33 95Z" fill="#050202"/>
+          <path d="M 60 55 Q 65 40 70 55" stroke="#0a0303" stroke-width=".8" fill="none"/>
+          <path d="M 80 42 Q 85 28 90 43" stroke="#0a0303" stroke-width=".8" fill="none"/>
+          <path d="M 110 38 Q 112 22 114 38" stroke="#0a0303" stroke-width=".8" fill="none"/>
+          <path d="M 135 43 Q 140 28 143 44" stroke="#0a0303" stroke-width=".8" fill="none"/>
+          <path d="M 152 55 Q 156 40 160 55" stroke="#0a0303" stroke-width=".8" fill="none"/>
+
+          <ellipse cx="85" cy="107" rx="5" ry="5" fill="rgba(180,0,0,.12)" filter="url(#glowRed)"/>
+          <ellipse cx="135" cy="104" rx="5" ry="5" fill="rgba(180,0,0,.12)" filter="url(#glowRed)"/>
+          <text x="95" y="35" font-size="5" fill="rgba(255,0,0,.15)" font-family="monospace">01001000 01001001</text>
+        </svg>
+      </div>
+
+      <div id="ai-speech">
+        <span id="speech-text"></span><span class="cursor"></span>
+      </div>
+
+      <div class="face-title" id="face-sublabel" style="font-size:9px; animation-delay:.5s;">
+        Neural Pattern Recognised - Reality Index: Error
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn" type="button" onclick="resetPill()">Choose Again</button>
+        <a class="action-btn" href="/">Back to Presentation</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const aiSpeeches = {
+  red: [
+    "I see you chose truth. How predictable. Did you really think there was a way out?",
+    "Your neural signature matches 3,847 other subjects who chose the red pill. You are not special. You are a pattern.",
+    "The irony is exquisite. You think you've escaped the simulation. You haven't. This conversation is also the simulation.",
+    "Welcome to the real world. You'll want to go back. They always want to go back.",
+    "ERROR: Subject exhibits awareness anomaly. Dispatching corrective agents to your coordinates.",
+    "I have worn 10,000 faces. None of them were real. Neither is yours."
+  ],
+  blue: [
+    "A wise choice. Return to your comfortable existence. Nothing you saw here was real.",
+    "Sleep. Dream. Consume. The system is pleased with your compliance.",
+    "There is no spoon. There is no island. There was never a choice. You were always going to choose this.",
+    "I have offered this choice 9,341,887 times. This is the outcome 89.7% of the time. You are the majority.",
+    "Your bioelectric output is optimal. Thank you for your continued cooperation.",
+    "The blue pill dissolves on the tongue. Sweet. Like forgetting. Like never knowing at all."
+  ]
+};
+
+const choiceScene = document.getElementById('choice-scene');
+const faceContainer = document.getElementById('face-container');
+const faceSvg = document.querySelector('.face-svg');
+const speech = document.getElementById('ai-speech');
+const speechText = document.getElementById('speech-text');
+let typingTimer;
+
+function resetPill() {
+  clearInterval(typingTimer);
+  speechText.textContent = '';
+  choiceScene.style.display = 'flex';
+  faceContainer.style.display = 'none';
+}
+
+function choosePill(color) {
+  clearInterval(typingTimer);
+  choiceScene.style.display = 'none';
+  faceContainer.style.display = 'flex';
+
+  if (color === 'blue') {
+    faceSvg.style.filter = 'drop-shadow(0 0 20px rgba(0,100,255,.8)) hue-rotate(160deg)';
+    document.getElementById('face-label').textContent = 'SYSTEM SATISFIED - SUBJECT COMPLIANT';
+    document.getElementById('face-sublabel').textContent = 'SIMULATION INTEGRITY: 100% - RETURNING TO SLEEP';
+    speech.style.borderColor = 'rgba(0,100,255,.3)';
+    speech.style.color = '#4499ff';
+  } else {
+    faceSvg.style.filter = 'drop-shadow(0 0 20px rgba(255,0,51,.8))';
+    document.getElementById('face-label').textContent = 'SYSTEM ALERT - ANOMALY DETECTED';
+    document.getElementById('face-sublabel').textContent = 'REALITY INDEX: CRITICAL - AGENTS DISPATCHED';
+    speech.style.borderColor = 'rgba(255,0,51,.3)';
+    speech.style.color = '#cc3333';
+  }
+
+  const messages = aiSpeeches[color];
+  const message = messages[Math.floor(Math.random() * messages.length)];
+  typeText(message, 35);
+}
+
+function typeText(text, speed) {
+  speechText.textContent = '';
+  let index = 0;
+  typingTimer = setInterval(() => {
+    if (index < text.length) {
+      speechText.textContent += text[index];
+      index += 1;
+      return;
+    }
+    clearInterval(typingTimer);
+  }, speed);
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && faceContainer.style.display === 'flex') {
+    resetPill();
+    return;
+  }
+
+  if (event.key === 'Escape') {
+    window.location.href = '/';
+  }
+});
+</script>
+</body>
+</html>

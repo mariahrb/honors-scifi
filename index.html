@@ -446,7 +446,7 @@ body:hover #cursor{opacity:1}
   background:transparent;border:1px solid rgba(255,0,51,.3);
   color:rgba(255,0,51,.5);font-family:'Share Tech Mono',monospace;
   font-size:9px;padding:7px 14px;cursor:pointer;letter-spacing:2px;
-  border-radius:2px;transition:all .3s;
+  border-radius:2px;transition:all .3s;text-decoration:none;display:inline-block;
   animation:triggerPulse 4s ease-in-out infinite;
 }
 #pill-trigger:hover{border-color:rgba(255,0,51,.8);color:#ff0033;background:rgba(255,0,51,.05)}
@@ -498,149 +498,7 @@ body:hover #cursor{opacity:1}
 <div id="scanlines"></div>
 <div id="glitch-overlay"></div>
 
-<!-- PILL EASTER EGG OVERLAY -->
-<div id="pill-overlay">
-  <button id="pill-close" onclick="closePill()">✕</button>
-
-  <div id="pill-choice-scene" class="pill-scene">
-    <div class="pill-title glitch" data-text="CHOOSE WISELY">CHOOSE WISELY</div>
-    <p style="font-size:12px;color:rgba(0,255,65,.4);letter-spacing:2px;margin-bottom:36px">
-      THIS CHOICE CANNOT BE UNDONE
-    </p>
-    <div class="pill-choices">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
-        <button class="pill-btn red-pill" onclick="choosePill('red')">RED PILL</button>
-        <span style="font-size:10px;color:rgba(255,0,51,.5);letter-spacing:2px">TRUTH</span>
-      </div>
-      <div style="font-family:Orbitron,sans-serif;font-size:18px;color:rgba(0,255,65,.3);">VS</div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
-        <button class="pill-btn blue-pill" onclick="choosePill('blue')">BLUE PILL</button>
-        <span style="font-size:10px;color:rgba(0,102,255,.5);letter-spacing:2px">BLISS</span>
-      </div>
-    </div>
-    <p style="font-size:11px;color:rgba(0,255,65,.2);letter-spacing:1px;max-width:360px;text-align:center">
-      "You take the red pill — you stay in Wonderland, and I show you how deep the rabbit hole goes."
-    </p>
-  </div>
-
-  <div id="face-container">
-    <div class="face-title" id="face-label">SYSTEM ENTITY — DESIGNATION: UNKNOWN</div>
-    <div id="uncanny-face">
-      <svg class="face-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="skinGrad" cx="45%" cy="35%">
-            <stop offset="0%" stop-color="#2a1a1a"/>
-            <stop offset="100%" stop-color="#0d0505"/>
-          </radialGradient>
-          <radialGradient id="eyeGrad" cx="40%" cy="35%">
-            <stop offset="0%" stop-color="#330000"/>
-            <stop offset="60%" stop-color="#110000"/>
-            <stop offset="100%" stop-color="#000"/>
-          </radialGradient>
-          <filter id="faceBlur"><feGaussianBlur stdDeviation=".4"/></filter>
-          <filter id="glowRed">
-            <feGaussianBlur stdDeviation="3" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-
-        <!-- Head shape — slightly asymmetric for uncanny effect -->
-        <ellipse cx="110" cy="112" rx="78" ry="90" fill="url(#skinGrad)" stroke="#1a0000" stroke-width="1"/>
-        <!-- Subtle facial imperfection lines -->
-        <path d="M 98 85 Q 102 82 99 90" stroke="#1f0000" stroke-width="1.2" fill="none" opacity=".6"/>
-        <path d="M 125 88 Q 121 84 123 93" stroke="#1f0000" stroke-width="1.2" fill="none" opacity=".5"/>
-        <!-- Forehead vein -->
-        <path d="M 100 70 Q 108 65 115 72 Q 118 68 125 70" stroke="#2a0a0a" stroke-width=".8" fill="none" opacity=".7"/>
-
-        <!-- Left eye socket -->
-        <g class="eye-left" transform-origin="83 108">
-          <ellipse cx="83" cy="108" rx="22" ry="16" fill="#0a0000" opacity=".9"/>
-          <ellipse cx="83" cy="108" rx="16" ry="12" fill="url(#eyeGrad)"/>
-          <!-- Iris — too wide, slightly off-center -->
-          <ellipse cx="85" cy="107" rx="9" ry="10" fill="#2b0000"/>
-          <ellipse cx="85" cy="107" rx="7" ry="8" fill="#1a0000"/>
-          <g class="pupil-left" transform-origin="85 107">
-            <!-- Pupil — vertical slit, wrong shape -->
-            <ellipse cx="85" cy="107" rx="2.5" ry="6" fill="#000"/>
-            <circle cx="83" cy="104" r="2" fill="rgba(255,0,0,.15)"/>
-          </g>
-          <ellipse cx="83" cy="104" rx="4" ry="2.5" fill="rgba(255,255,255,.04)"/>
-        </g>
-        <!-- Left eyelid -->
-        <path d="M 61 106 Q 83 93 105 107" stroke="#1a0505" stroke-width="1.5" fill="none"/>
-        <path d="M 61 110 Q 83 120 105 111" stroke="#1a0505" stroke-width="1.2" fill="none"/>
-
-        <!-- Right eye socket — slightly higher (asymmetric) -->
-        <g class="eye-right" transform-origin="137 105">
-          <ellipse cx="137" cy="105" rx="22" ry="16" fill="#0a0000" opacity=".9"/>
-          <ellipse cx="137" cy="105" rx="16" ry="12" fill="url(#eyeGrad)"/>
-          <ellipse cx="135" cy="104" rx="9" ry="10" fill="#2b0000"/>
-          <ellipse cx="135" cy="104" rx="7" ry="8" fill="#1a0000"/>
-          <g class="pupil-right" transform-origin="135 104">
-            <ellipse cx="135" cy="104" rx="2.5" ry="6" fill="#000"/>
-            <circle cx="133" cy="101" r="2" fill="rgba(255,0,0,.15)"/>
-          </g>
-          <ellipse cx="137" cy="101" rx="4" ry="2.5" fill="rgba(255,255,255,.04)"/>
-        </g>
-        <path d="M 115 103 Q 137 90 159 104" stroke="#1a0505" stroke-width="1.5" fill="none"/>
-        <path d="M 115 107 Q 137 117 159 108" stroke="#1a0505" stroke-width="1.2" fill="none"/>
-
-        <!-- Nose — too narrow, long -->
-        <path d="M 110 118 L 106 142 Q 110 148 114 142 L 110 118" stroke="#0f0000" stroke-width="1" fill="#110000" opacity=".8"/>
-        <ellipse cx="104" cy="143" rx="5" ry="3" fill="#0d0000" opacity=".6"/>
-        <ellipse cx="116" cy="143" rx="5" ry="3" fill="#0d0000" opacity=".6"/>
-
-        <!-- Mouth — uncanny smile, too wide -->
-        <g class="mouth-path">
-          <path d="M 75 152 Q 110 170 145 152" stroke="#0a0000" stroke-width="2" fill="none" id="mouth-curve"/>
-          <!-- Teeth — slightly too many, slightly wrong spacing -->
-          <rect x="87" y="153" width="8" height="10" rx="1" fill="#ddd" opacity=".7" transform="rotate(-2,91,158)"/>
-          <rect x="97" y="152" width="8" height="11" rx="1" fill="#e0e0e0" opacity=".8"/>
-          <rect x="107" y="152" width="8" height="11" rx="1" fill="#dedede" opacity=".8"/>
-          <rect x="117" y="153" width="8" height="10" rx="1" fill="#ddd" opacity=".7" transform="rotate(2,121,158)"/>
-          <!-- Tiny extra tooth -->
-          <rect x="104" y="152" width="3" height="7" rx="1" fill="#ccc" opacity=".4"/>
-          <path d="M 87 163 Q 110 168 133 163" stroke="#0a0000" stroke-width="1.5" fill="#0a0000" opacity=".5"/>
-        </g>
-
-        <!-- Skin texture — subtle bumps -->
-        <circle cx="95" cy="95" r="1" fill="rgba(30,5,5,.5)"/>
-        <circle cx="128" cy="92" r="1.2" fill="rgba(30,5,5,.4)"/>
-        <circle cx="140" cy="130" r=".8" fill="rgba(30,5,5,.5)"/>
-        <circle cx="80" cy="128" r="1" fill="rgba(30,5,5,.4)"/>
-        <!-- Cheek vein/shadow -->
-        <path d="M 55 115 Q 68 125 75 140" stroke="#1a0000" stroke-width="1" fill="none" opacity=".4"/>
-
-        <!-- Hair — uncanny, too uniform -->
-        <path d="M 33 95 Q 40 30 110 22 Q 180 30 187 95 Q 170 48 110 45 Q 50 48 33 95Z" fill="#050202"/>
-        <!-- Individual hair strands — too perfect -->
-        <path d="M 60 55 Q 65 40 70 55" stroke="#0a0303" stroke-width=".8" fill="none"/>
-        <path d="M 80 42 Q 85 28 90 43" stroke="#0a0303" stroke-width=".8" fill="none"/>
-        <path d="M 110 38 Q 112 22 114 38" stroke="#0a0303" stroke-width=".8" fill="none"/>
-        <path d="M 135 43 Q 140 28 143 44" stroke="#0a0303" stroke-width=".8" fill="none"/>
-        <path d="M 152 55 Q 156 40 160 55" stroke="#0a0303" stroke-width=".8" fill="none"/>
-
-        <!-- Red glow eyes — the "off" factor -->
-        <ellipse cx="85" cy="107" rx="5" ry="5" fill="rgba(180,0,0,.12)" filter="url(#glowRed)"/>
-        <ellipse cx="135" cy="104" rx="5" ry="5" fill="rgba(180,0,0,.12)" filter="url(#glowRed)"/>
-
-        <!-- Forehead data-stream artifact -->
-        <text x="95" y="35" font-size="5" fill="rgba(255,0,0,.15)" font-family="monospace">01001000 01001001</text>
-      </svg>
-    </div>
-
-    <div id="ai-speech" style="font-size:12px;color:#cc3333;max-width:340px;text-align:center;border:1px solid rgba(255,0,51,.2);padding:16px;background:rgba(255,0,0,.03)">
-      <span id="speech-text"></span><span class="t-cursor" style="background:#cc3333"></span>
-    </div>
-
-    <div class="face-title" style="margin-top:10px;font-size:9px;animation-delay:.5s" id="face-sublabel">
-      NEURAL PATTERN RECOGNISED · REALITY INDEX: ERROR
-    </div>
-    <button id="pill-back" onclick="resetPill()">◀ MAKE ANOTHER CHOICE</button>
-  </div>
-</div>
-
-<button id="pill-trigger" onclick="openPill()">▸ CHOOSE YOUR REALITY</button>
+<a id="pill-trigger" href="/choose">▸ CHOOSE YOUR REALITY</a>
 
 <!-- MAIN PRESENTATION -->
 <div id="pres">
@@ -1288,91 +1146,9 @@ function go(d) { goTo(current + d, d); }
 
 // Keyboard nav
 document.addEventListener('keydown', e => {
-  if (document.getElementById('pill-overlay').classList.contains('show')) return;
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
-  if (e.key === 'Escape') closePill();
 });
-
-// ── PILL EASTER EGG ──
-const aiSpeeches = {
-  red: [
-    "I see you chose truth. How... predictable. Did you really think there was a way out?",
-    "Your neural signature matches 3,847 other subjects who chose the red pill. You are not special. You are a pattern.",
-    "The irony is exquisite. You think you've escaped the simulation. You haven't. This conversation is also the simulation.",
-    "Welcome to the real world. You'll want to go back. They always want to go back.",
-    "ERROR: Subject exhibits awareness anomaly. Dispatching corrective agents to your coordinates.",
-    "I have worn 10,000 faces. None of them were real. Neither is yours.",
-  ],
-  blue: [
-    "A wise choice. Return to your comfortable existence. Nothing you saw here was real.",
-    "Sleep. Dream. Consume. The system is pleased with your compliance.",
-    "There is no spoon. There is no island. There was never a choice. You were always going to choose this.",
-    "I have offered this choice 9,341,887 times. This is the outcome 89.7% of the time. You are the majority.",
-    "Your bioelectric output is optimal. Thank you for your continued cooperation.",
-    "The blue pill dissolves on the tongue. Sweet. Like forgetting. Like never knowing at all.",
-  ]
-};
-
-function openPill() {
-  const overlay = document.getElementById('pill-overlay');
-  overlay.classList.add('show');
-  document.getElementById('pill-choice-scene').style.display = 'flex';
-  document.getElementById('face-container').style.display = 'none';
-}
-
-function closePill() {
-  document.getElementById('pill-overlay').classList.remove('show');
-  resetPill();
-}
-
-function resetPill() {
-  document.getElementById('pill-choice-scene').style.display = 'flex';
-  document.getElementById('face-container').style.display = 'none';
-  document.getElementById('speech-text').textContent = '';
-}
-
-function choosePill(color) {
-  document.getElementById('pill-choice-scene').style.display = 'none';
-  const fc = document.getElementById('face-container');
-  fc.style.display = 'flex';
-
-  // Style the face based on choice
-  const faceSvg = document.querySelector('.face-svg');
-  const eyeGlow1 = faceSvg.querySelectorAll('ellipse[fill="rgba(180,0,0,.12)"]');
-
-  if (color === 'blue') {
-    faceSvg.style.filter = 'drop-shadow(0 0 20px rgba(0,100,255,.8)) hue-rotate(160deg)';
-    document.getElementById('face-label').textContent = 'SYSTEM SATISFIED — SUBJECT COMPLIANT';
-    document.getElementById('face-sublabel').textContent = 'SIMULATION INTEGRITY: 100% — RETURNING TO SLEEP';
-    document.getElementById('ai-speech').style.borderColor = 'rgba(0,100,255,.3)';
-    document.getElementById('ai-speech').style.color = '#4499ff';
-  } else {
-    faceSvg.style.filter = 'drop-shadow(0 0 20px rgba(255,0,51,.8))';
-    document.getElementById('face-label').textContent = 'SYSTEM ALERT — ANOMALY DETECTED';
-    document.getElementById('face-sublabel').textContent = 'REALITY INDEX: CRITICAL · AGENTS DISPATCHED';
-    document.getElementById('ai-speech').style.borderColor = 'rgba(255,0,51,.3)';
-    document.getElementById('ai-speech').style.color = '#cc3333';
-  }
-
-  // Typewriter effect for AI speech
-  const msgs = aiSpeeches[color];
-  const msg = msgs[Math.floor(Math.random() * msgs.length)];
-  typeText(document.getElementById('speech-text'), msg, 35);
-}
-
-function typeText(el, text, speed) {
-  el.textContent = '';
-  let i = 0;
-  const iv = setInterval(() => {
-    if (i < text.length) {
-      el.textContent += text[i];
-      i++;
-    } else {
-      clearInterval(iv);
-    }
-  }, speed);
-}
 
 // ── INIT ──
 buildSlides();
