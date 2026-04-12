@@ -441,16 +441,29 @@ body:hover #cursor{opacity:1}
 }
 #pill-close:hover{color:var(--green)}
 
-/* ── PILL TRIGGER BTN ── */
-#pill-trigger {
-  position:fixed;bottom:80px;right:24px;z-index:10;
-  background:transparent;border:1px solid rgba(255,0,51,.3);
-  color:rgba(255,0,51,.5);font-family:'Share Tech Mono',monospace;
-  font-size:9px;padding:7px 14px;cursor:pointer;letter-spacing:2px;
+/* ── QUICK LINKS ── */
+#quick-links {
+  position:fixed;right:24px;bottom:80px;z-index:10;
+  display:flex;flex-direction:column;gap:10px;align-items:flex-end;
+}
+.quick-link {
+  background:transparent;border:1px solid rgba(0,255,65,.24);
+  color:rgba(0,255,65,.58);font-family:'Share Tech Mono',monospace;
+  font-size:9px;padding:8px 14px;cursor:pointer;letter-spacing:2px;
   border-radius:2px;transition:all .3s;text-decoration:none;display:inline-block;
+  min-width:176px;text-align:center;background:rgba(0,0,0,.4);
+}
+.quick-link:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,65,.06)}
+#pill-trigger{
+  border-color:rgba(255,0,51,.3);
+  color:rgba(255,0,51,.56);
   animation:triggerPulse 4s ease-in-out infinite;
 }
 #pill-trigger:hover{border-color:rgba(255,0,51,.8);color:#ff0033;background:rgba(255,0,51,.05)}
+#chat-trigger{
+  border-color:rgba(0,255,65,.3);
+  color:rgba(0,255,65,.62);
+}
 @keyframes triggerPulse{0%,100%{opacity:.4}50%{opacity:.9}}
 
 /* ── Q&A BOXES ── */
@@ -489,6 +502,12 @@ body:hover #cursor{opacity:1}
   .compare-grid,.stats-grid,.qa-grid{grid-template-columns:1fr}
   .pill-choices{gap:30px}
   #pres{font-size:13px}
+  #quick-links{
+    left:12px;right:12px;bottom:72px;align-items:stretch;
+  }
+  .quick-link{
+    min-width:0;width:100%;
+  }
 }
 </style>
 </head>
@@ -499,7 +518,10 @@ body:hover #cursor{opacity:1}
 <div id="scanlines"></div>
 <div id="glitch-overlay"></div>
 
-<a id="pill-trigger" href="/choose">▸ CHOOSE YOUR REALITY</a>
+<div id="quick-links">
+  <a class="quick-link" id="chat-trigger" href="/system">▸ ENTER SYSTEM CHAT</a>
+  <a class="quick-link" id="pill-trigger" href="/choose">▸ CHOOSE YOUR REALITY</a>
+</div>
 
 <!-- MAIN PRESENTATION -->
 <div id="pres">
