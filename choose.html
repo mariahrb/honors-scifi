@@ -49,6 +49,48 @@ body::after {
   pointer-events: none;
 }
 
+body.is-page-transition .shell,
+body.is-page-transition .back-link {
+  opacity: 0.16;
+  transform: scale(.992);
+  filter: blur(2px);
+  transition: opacity .18s ease, transform .18s ease, filter .18s ease;
+}
+
+#page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .22s ease, visibility .22s ease;
+  background: radial-gradient(circle at 50% 50%, rgba(0,255,65,0.08), rgba(0,0,0,0.94) 62%);
+}
+
+#page-transition.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+#transition-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.transition-copy {
+  position: absolute;
+  left: 50%;
+  bottom: 10vh;
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: rgba(0,255,65,.72);
+  text-shadow: 0 0 18px rgba(0,255,65,.25);
+}
+
 .shell {
   position: relative;
   min-height: 100vh;
@@ -324,6 +366,10 @@ body::after {
 </head>
 <body>
 <a class="back-link" href="/">BACK TO PRESENTATION</a>
+<div id="page-transition" aria-hidden="true">
+  <canvas id="transition-canvas"></canvas>
+  <div class="transition-copy" id="transition-copy">SYSTEM TRANSFER</div>
+</div>
 
 <main class="shell">
   <section class="panel">
@@ -352,7 +398,7 @@ body::after {
       </p>
 
       <div class="action-row" style="margin-top: 24px;">
-        <a class="action-btn" href="/system">Enter System Interface</a>
+        <a class="action-btn" href="/system" data-rain-transition="ENTERING SYSTEM CHAT">Enter System Interface</a>
         <a class="action-btn" href="/">Back to Presentation</a>
       </div>
     </div>
@@ -453,7 +499,7 @@ body::after {
 
       <div class="action-row">
         <button class="action-btn" type="button" onclick="resetPill()">Choose Again</button>
-        <a class="action-btn" id="system-entry" href="/system">Enter System Interface</a>
+        <a class="action-btn" id="system-entry" href="/system" data-rain-transition="ENTERING SYSTEM CHAT">Enter System Interface</a>
         <a class="action-btn" href="/">Back to Presentation</a>
       </div>
     </div>
@@ -486,6 +532,73 @@ const faceSvg = document.querySelector('.face-svg');
 const speech = document.getElementById('ai-speech');
 const speechText = document.getElementById('speech-text');
 let typingTimer;
+
+function setupRainTransition() {
+  const overlay = document.getElementById('page-transition');
+  const canvas = document.getElementById('transition-canvas');
+  const label = document.getElementById('transition-copy');
+  const ctx = canvas.getContext('2d');
+  const chars = 'アイウエオカキクケコサシスセソ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let animationId = 0;
+  let navigating = false;
+  let cols = 0;
+  let drops = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    cols = Math.max(1, Math.floor(canvas.width / 18));
+    drops = Array(cols).fill(0).map(() => Math.random() * -40);
+  }
+
+  function draw() {
+    ctx.fillStyle = 'rgba(0,0,0,0.16)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = 'bold 16px monospace';
+    drops.forEach((drop, index) => {
+      const char = chars[Math.floor(Math.random() * chars.length)];
+      const x = index * 18;
+      const y = drop * 18;
+      ctx.fillStyle = index % 6 === 0 ? '#c7ffd8' : '#00ff41';
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = '#00ff41';
+      ctx.fillText(char, x, y);
+      if (y > canvas.height && Math.random() > 0.9) drops[index] = Math.random() * -8;
+      drops[index] += 1.9 + Math.random() * 1.2;
+    });
+    animationId = requestAnimationFrame(draw);
+  }
+
+  function beginNavigation(href, text) {
+    if (navigating) return;
+    navigating = true;
+    label.textContent = text || 'SYSTEM TRANSFER';
+    resize();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.body.classList.add('is-page-transition');
+    overlay.classList.add('active');
+    draw();
+    setTimeout(() => {
+      cancelAnimationFrame(animationId);
+      window.location.href = href;
+    }, 760);
+  }
+
+  window.addEventListener('resize', resize);
+
+  document.querySelectorAll('[data-rain-transition]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+      ) return;
+
+      event.preventDefault();
+      beginNavigation(link.href, link.dataset.rainTransition);
+    });
+  });
+}
 
 function resetPill() {
   clearInterval(typingTimer);
@@ -542,6 +655,8 @@ document.addEventListener('keydown', (event) => {
     window.location.href = '/';
   }
 });
+
+setupRainTransition();
 </script>
 </body>
 </html>
