@@ -107,6 +107,9 @@ body:hover #cursor{opacity:1}
 /* ── MAIN SLIDE AREA ── */
 #slide-area {
   flex:1;overflow:hidden;position:relative;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(0,255,65,.05), transparent 42%),
+    linear-gradient(180deg, rgba(0,255,65,.015), transparent 28%, transparent 72%, rgba(0,255,65,.02));
 }
 
 /* ── SLIDE ── */
@@ -115,20 +118,23 @@ body:hover #cursor{opacity:1}
   display:flex;flex-direction:column;justify-content:center;align-items:center;
   padding:32px 48px;text-align:center;
   opacity:0;pointer-events:none;
-  transition:none;
+  visibility:hidden;
+  transform:translateY(10px) scale(.992);
+  filter:blur(7px);
 }
-.slide.active {opacity:1;pointer-events:all}
+.slide.active {opacity:1;pointer-events:all;visibility:visible;transform:none;filter:none}
 
 /* Transition classes */
-.slide.enter-right {animation:enterRight .5s cubic-bezier(.23,1,.32,1) forwards}
-.slide.enter-left  {animation:enterLeft  .5s cubic-bezier(.23,1,.32,1) forwards}
-.slide.exit-right  {animation:exitRight  .4s ease-in forwards}
-.slide.exit-left   {animation:exitLeft   .4s ease-in forwards}
+.slide.enter-right {animation:enterRight .34s cubic-bezier(.22,1,.36,1) forwards}
+.slide.enter-left  {animation:enterLeft  .34s cubic-bezier(.22,1,.36,1) forwards}
+.slide.exit-right  {animation:exitRight  .18s ease-in forwards;visibility:visible}
+.slide.exit-left   {animation:exitLeft   .18s ease-in forwards;visibility:visible}
 
-@keyframes enterRight{from{opacity:0;transform:translateX(60px) skewX(-2deg)}to{opacity:1;transform:none}}
-@keyframes enterLeft {from{opacity:0;transform:translateX(-60px) skewX(2deg)} to{opacity:1;transform:none}}
-@keyframes exitRight {from{opacity:1;transform:none}to{opacity:0;transform:translateX(-40px)}}
-@keyframes exitLeft  {from{opacity:1;transform:none}to{opacity:0;transform:translateX(40px)}}
+@keyframes enterRight{from{opacity:0;transform:translateX(34px) scale(.985);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+@keyframes enterLeft {from{opacity:0;transform:translateX(-34px) scale(.985);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+@keyframes exitRight {from{opacity:1;transform:none;filter:none}to{opacity:0;transform:translateX(-22px) scale(.992);filter:blur(6px)}}
+@keyframes exitLeft  {from{opacity:1;transform:none;filter:none}to{opacity:0;transform:translateX(22px) scale(.992);filter:blur(6px)}}
+@keyframes contentLift{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
 /* ── TYPOGRAPHY ── */
 .section-badge {
@@ -149,6 +155,21 @@ body:hover #cursor{opacity:1}
 .divider {
   width:80px;height:1px;margin:14px auto;
   background:linear-gradient(90deg,transparent,var(--green),transparent);
+}
+
+.slide.active .section-badge,
+.slide.active .slide-title,
+.slide.active .divider,
+.slide.active .body-text,
+.slide.active .compare-grid,
+.slide.active .video-frame,
+.slide.active .terminal,
+.slide.active .timeline,
+.slide.active .stats-grid,
+.slide.active .qa-grid,
+.slide.active .big-quote,
+.slide.active .pill-row {
+  animation:contentLift .34s ease-out both;
 }
 
 .body-text {
@@ -207,12 +228,44 @@ body:hover #cursor{opacity:1}
 .video-frame iframe{display:block;width:100%;aspect-ratio:16/9;border:none}
 .video-caption{font-size:11px;color:rgba(0,255,65,.4);letter-spacing:2px;margin-top:10px}
 
+/* ── QR SLIDE ── */
+.qr-panel{
+  display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:center;
+  width:100%;max-width:760px;margin-top:10px;text-align:left;
+  border:1px solid rgba(0,255,65,.16);background:rgba(0,255,65,.03);
+  padding:22px;
+}
+.qr-frame{
+  background:#f3ffe9;border:1px solid rgba(0,255,65,.24);
+  padding:12px;border-radius:4px;box-shadow:0 0 30px rgba(0,255,65,.08);
+}
+.qr-frame img{display:block;width:100%;height:auto}
+.qr-copy h4{
+  font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;
+  color:var(--green);margin-bottom:10px;
+}
+.qr-copy p{
+  font-size:13px;line-height:1.8;color:var(--green-dim);margin-bottom:12px;
+}
+.qr-link{
+  display:inline-block;border:1px solid rgba(0,255,65,.24);padding:9px 12px;
+  color:rgba(0,255,65,.78);text-decoration:none;font-size:11px;letter-spacing:2px;
+  background:rgba(0,0,0,.35);
+}
+
 /* ── TERMINAL SLIDE ── */
 .terminal {
   width:100%;max-width:640px;text-align:left;
   background:rgba(0,10,0,.9);border:1px solid rgba(0,255,65,.25);
   border-radius:4px;overflow:hidden;
   box-shadow:0 0 40px rgba(0,255,65,.08);
+  transform-origin:50% 0;
+  position:relative;
+}
+.terminal::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+  opacity:.5;
 }
 .terminal-bar{
   background:rgba(0,255,65,.08);padding:8px 14px;
@@ -225,6 +278,21 @@ body:hover #cursor{opacity:1}
 .t-out{color:rgba(0,255,65,.6)}
 .t-cursor{display:inline-block;width:8px;height:14px;background:var(--green);animation:blink .8s step-end infinite;vertical-align:middle;margin-left:2px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes terminalOpen{
+  0%{opacity:0;transform:translateY(24px) scale(.94);filter:blur(8px)}
+  55%{opacity:1;transform:translateY(-3px) scale(1.01);filter:blur(0)}
+  100%{opacity:1;transform:none;filter:none}
+}
+@keyframes terminalBoot{
+  from{box-shadow:0 0 0 rgba(0,255,65,0)}
+  to{box-shadow:0 0 40px rgba(0,255,65,.08)}
+}
+.slide-terminal.active .terminal{
+  animation:terminalOpen .42s cubic-bezier(.2,.95,.2,1) .04s both,terminalBoot .42s ease-out both;
+}
+.slide-terminal.active .terminal-body{
+  animation:contentLift .28s ease-out .12s both;
+}
 
 /* ── QUOTE SLIDE ── */
 .big-quote {
@@ -466,6 +534,28 @@ body:hover #cursor{opacity:1}
 }
 @keyframes triggerPulse{0%,100%{opacity:.4}50%{opacity:.9}}
 
+/* ── PAGE TRANSITION ── */
+#page-transition{
+  position:fixed;inset:0;z-index:2000;pointer-events:none;
+  opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease;
+  background:radial-gradient(circle at 50% 50%, rgba(0,255,65,.08), rgba(0,0,0,.94) 62%);
+}
+#page-transition.active{opacity:1;visibility:visible}
+#transition-canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+}
+.transition-copy{
+  position:absolute;left:50%;bottom:10vh;transform:translateX(-50%);
+  font-size:11px;letter-spacing:4px;color:rgba(0,255,65,.72);
+  text-shadow:0 0 18px rgba(0,255,65,.25);
+}
+body.is-page-transition #pres,
+body.is-page-transition #quick-links,
+body.is-page-transition #cursor{
+  opacity:.16;transform:scale(.992);filter:blur(2px);
+  transition:opacity .18s ease,transform .18s ease,filter .18s ease;
+}
+
 /* ── Q&A BOXES ── */
 .qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:720px;margin-top:12px}
 .qa-item{
@@ -500,6 +590,8 @@ body:hover #cursor{opacity:1}
 /* Responsive */
 @media(max-width:600px){
   .compare-grid,.stats-grid,.qa-grid{grid-template-columns:1fr}
+  .qr-panel{grid-template-columns:1fr;text-align:center}
+  .qr-copy{text-align:center}
   .pill-choices{gap:30px}
   #pres{font-size:13px}
   #quick-links{
@@ -519,16 +611,21 @@ body:hover #cursor{opacity:1}
 <div id="glitch-overlay"></div>
 
 <div id="quick-links">
-  <a class="quick-link" id="chat-trigger" href="/system">▸ ENTER SYSTEM CHAT</a>
-  <a class="quick-link" id="pill-trigger" href="/choose">▸ CHOOSE YOUR REALITY</a>
+  <a class="quick-link" id="chat-trigger" href="/system" data-rain-transition="ENTERING SYSTEM CHAT">▸ ENTER SYSTEM CHAT</a>
+  <a class="quick-link" id="pill-trigger" href="/choose" data-rain-transition="CHOOSING REALITY">▸ CHOOSE YOUR REALITY</a>
+</div>
+
+<div id="page-transition" aria-hidden="true">
+  <canvas id="transition-canvas"></canvas>
+  <div class="transition-copy" id="transition-copy">SYSTEM TRANSFER</div>
 </div>
 
 <!-- MAIN PRESENTATION -->
 <div id="pres">
   <div id="topbar">
     <div class="logo">THE INVENTION OF MOREL vs. THE MATRIX</div>
-    <div id="progress-bar-wrap"><div id="progress-bar" style="width:3.4%"></div></div>
-    <div class="slide-counter" id="counter">01 / 29</div>
+    <div id="progress-bar-wrap"><div id="progress-bar" style="width:3.3%"></div></div>
+    <div class="slide-counter" id="counter">01 / 30</div>
   </div>
   <div id="slide-area" id="slides"></div>
   <div id="nav">
@@ -579,6 +676,74 @@ document.addEventListener('mousemove', e => {
   }, 35);
 })();
 
+// ── PAGE TRANSITION ──
+function setupRainTransition() {
+  const overlay = document.getElementById('page-transition');
+  const canvas = document.getElementById('transition-canvas');
+  const label = document.getElementById('transition-copy');
+  const ctx = canvas.getContext('2d');
+  const chars = 'アイウエオカキクケコサシスセソ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let animationId = 0;
+  let navigating = false;
+  let cols = 0;
+  let drops = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    cols = Math.max(1, Math.floor(canvas.width / 18));
+    drops = Array(cols).fill(0).map(() => Math.random() * -40);
+  }
+
+  function draw() {
+    ctx.fillStyle = 'rgba(0,0,0,0.16)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = 'bold 16px monospace';
+    drops.forEach((drop, index) => {
+      const char = chars[Math.floor(Math.random() * chars.length)];
+      const x = index * 18;
+      const y = drop * 18;
+      ctx.fillStyle = index % 6 === 0 ? '#c7ffd8' : '#00ff41';
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = '#00ff41';
+      ctx.fillText(char, x, y);
+      if (y > canvas.height && Math.random() > 0.9) drops[index] = Math.random() * -8;
+      drops[index] += 1.9 + Math.random() * 1.2;
+    });
+    animationId = requestAnimationFrame(draw);
+  }
+
+  function beginNavigation(href, text) {
+    if (navigating) return;
+    navigating = true;
+    label.textContent = text || 'SYSTEM TRANSFER';
+    resize();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.body.classList.add('is-page-transition');
+    overlay.classList.add('active');
+    draw();
+    setTimeout(() => {
+      cancelAnimationFrame(animationId);
+      window.location.href = href;
+    }, 760);
+  }
+
+  window.addEventListener('resize', resize);
+
+  document.querySelectorAll('[data-rain-transition]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+      ) return;
+
+      event.preventDefault();
+      beginNavigation(link.href, link.dataset.rainTransition);
+    });
+  });
+}
+
 // ── SLIDES DATA ──
 const slides = [
   // 1 – INTRO
@@ -599,10 +764,29 @@ const slides = [
     </div>`
   },
 
-  // 2 – OPENING STATEMENT
+  // 2 – QR INVITE
+  { section:'Introduction', person:'Person 1', type:'default',
+    html:`
+    <div class="section-badge">Interactive Invite · Slide 02</div>
+    <div class="slide-title">Join Us In This Experience</div>
+    <div class="divider"></div>
+    <div class="qr-panel">
+      <div class="qr-frame">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https%3A%2F%2Fhonors-scifi.vercel.app%2F" alt="QR code for honors-scifi.vercel.app">
+      </div>
+      <div class="qr-copy">
+        <h4>Scan To Enter The System</h4>
+        <p>Open the live presentation on your phone, explore the choose-your-reality route, and test the system chat while the deck moves forward.</p>
+        <p>It works best as a second-screen experience: scan now, keep it open, and step into the simulation with us.</p>
+        <a class="qr-link" href="https://honors-scifi.vercel.app/" target="_blank" rel="noopener noreferrer">honors-scifi.vercel.app</a>
+      </div>
+    </div>`
+  },
+
+  // 3 – OPENING STATEMENT
   { section:'Introduction', person:'Person 1', type:'quote',
     html:`
-    <div class="section-badge">Opening Statement · Slide 02</div>
+    <div class="section-badge">Opening Statement · Slide 03</div>
     <div class="big-quote">
       "Reality is based on perception.<br>Perception can be manipulated."
       <cite>— CENTRAL THESIS</cite>
@@ -615,10 +799,10 @@ const slides = [
     </div>`
   },
 
-  // 3 – MOREL INTRO
+  // 4 – MOREL INTRO
   { section:'The Invention of Morel', person:'Person 1', type:'bg-grid',
     html:`
-    <div class="section-badge">The Invention of Morel · Slide 03</div>
+    <div class="section-badge">The Invention of Morel · Slide 04</div>
     <div class="slide-title">The Invention of Morel</div>
     <div class="divider"></div>
     <div class="body-text">
@@ -629,10 +813,10 @@ const slides = [
     </div>`
   },
 
-  // 4 – AUTHOR
+  // 5 – AUTHOR
   { section:'The Invention of Morel', person:'Person 1', type:'terminal',
     html:`
-    <div class="section-badge">Author · Slide 04</div>
+    <div class="section-badge">Author · Slide 05</div>
     <div class="slide-title">Adolfo Bioy Casares</div>
     <div class="divider"></div>
     <div class="terminal">
@@ -654,10 +838,10 @@ const slides = [
     </div>`
   },
 
-  // 5 – MOREL BACKGROUND
+  // 6 – MOREL BACKGROUND
   { section:'The Invention of Morel', person:'Person 1', type:'stats',
     html:`
-    <div class="section-badge">Background · Slide 05</div>
+    <div class="section-badge">Background · Slide 06</div>
     <div class="slide-title">Background of the Novel</div>
     <div class="divider"></div>
     <div class="stats-grid">
@@ -673,10 +857,10 @@ const slides = [
     </div>`
   },
 
-  // 6 – MOREL PLOT (JAZ)
+  // 7 – MOREL PLOT (JAZ)
   { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'timeline',
     html:`
-    <div class="section-badge">Plot · Slide 06</div>
+    <div class="section-badge">Plot · Slide 07</div>
     <div class="slide-title">Plot</div>
     <div class="divider"></div>
     <div class="timeline">
@@ -690,7 +874,7 @@ const slides = [
   // 7 – MOREL SETTING (JAZ)
   { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'default',
     html:`
-    <div class="section-badge">Setting · Slide 07</div>
+    <div class="section-badge">Setting · Slide 08</div>
     <div class="slide-title">The Island</div>
     <div class="divider"></div>
     <div class="video-frame" style="max-width:560px">
@@ -707,7 +891,7 @@ const slides = [
   // 8 – MOREL THEME (JAZ)
   { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'quote',
     html:`
-    <div class="section-badge">Theme · Slide 08</div>
+    <div class="section-badge">Theme · Slide 09</div>
     <div class="big-quote">
       "Illusion replaces reality.<br>Memory dominates experience."
       <cite>— CORE THEMES</cite>
@@ -723,7 +907,7 @@ const slides = [
   // 9 – MOREL CHARACTERS (JAZ)
   { section:'The Invention of Morel', person:'Person 2 — JAZ', type:'compare',
     html:`
-    <div class="section-badge">Characters · Slide 09</div>
+    <div class="section-badge">Characters · Slide 10</div>
     <div class="slide-title">Characters</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -737,7 +921,7 @@ const slides = [
   // 10 – TECHNOLOGY
   { section:'The Invention of Morel', person:'Person 3', type:'terminal',
     html:`
-    <div class="section-badge">Technology · Slide 10</div>
+    <div class="section-badge">Technology · Slide 11</div>
     <div class="slide-title">Morel's Machine</div>
     <div class="divider"></div>
     <div class="terminal">
@@ -762,7 +946,7 @@ const slides = [
   // 11 – MOREL SYMBOLISM
   { section:'The Invention of Morel', person:'Person 3', type:'compare',
     html:`
-    <div class="section-badge">Symbolism · Slide 11</div>
+    <div class="section-badge">Symbolism · Slide 12</div>
     <div class="slide-title">Symbolism</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -776,7 +960,7 @@ const slides = [
   // 12 – MATRIX INTRO
   { section:'The Matrix', person:'Person 3', type:'intro',
     html:`
-    <div class="section-badge">The Matrix · Slide 12</div>
+    <div class="section-badge">The Matrix · Slide 13</div>
     <div class="slide-title"><span class="glitch" data-text="WELCOME TO THE MATRIX">WELCOME TO THE MATRIX</span></div>
     <div class="divider"></div>
     <div class="body-text">
@@ -791,7 +975,7 @@ const slides = [
   // 13 – WACHOWSKIS
   { section:'The Matrix', person:'Person 3', type:'terminal',
     html:`
-    <div class="section-badge">Directors · Slide 13</div>
+    <div class="section-badge">Directors · Slide 14</div>
     <div class="slide-title">The Wachowskis</div>
     <div class="divider"></div>
     <div class="terminal">
@@ -817,7 +1001,7 @@ const slides = [
   // 14 – MATRIX BACKGROUND (Person 1)
   { section:'The Matrix', person:'Person 1', type:'stats',
     html:`
-    <div class="section-badge">Background · Slide 14</div>
+    <div class="section-badge">Background · Slide 15</div>
     <div class="slide-title">Background of The Matrix</div>
     <div class="divider"></div>
     <div class="stats-grid">
@@ -836,7 +1020,7 @@ const slides = [
   // 15 – MATRIX PLOT (Person 1)
   { section:'The Matrix', person:'Person 1', type:'timeline',
     html:`
-    <div class="section-badge">Plot · Slide 15</div>
+    <div class="section-badge">Plot · Slide 16</div>
     <div class="slide-title">Plot</div>
     <div class="divider"></div>
     <div class="timeline">
@@ -850,7 +1034,7 @@ const slides = [
   // 16 – MATRIX SETTING (JAZ)
   { section:'The Matrix', person:'Person 2 — JAZ', type:'compare',
     html:`
-    <div class="section-badge">Setting · Slide 16</div>
+    <div class="section-badge">Setting · Slide 17</div>
     <div class="slide-title">Two Worlds</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -864,7 +1048,7 @@ const slides = [
   // 17 – MATRIX THEME
   { section:'The Matrix', person:'Person 3', type:'quote',
     html:`
-    <div class="section-badge">Theme · Slide 17</div>
+    <div class="section-badge">Theme · Slide 18</div>
     <div class="big-quote">
       "Reality is constructed.<br>Truth requires the courage to look."
       <cite>— CORE THEMES</cite>
@@ -881,7 +1065,7 @@ const slides = [
   // 18 – MATRIX CHARACTERS
   { section:'The Matrix', person:'Person 3', type:'compare',
     html:`
-    <div class="section-badge">Characters · Slide 18</div>
+    <div class="section-badge">Characters · Slide 19</div>
     <div class="slide-title">Characters</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -895,7 +1079,7 @@ const slides = [
   // 19 – MATRIX TECHNOLOGY
   { section:'The Matrix', person:'Person 3', type:'terminal',
     html:`
-    <div class="section-badge">Technology · Slide 19</div>
+    <div class="section-badge">Technology · Slide 20</div>
     <div class="slide-title">The Simulation</div>
     <div class="divider"></div>
     <div class="terminal">
@@ -921,7 +1105,7 @@ const slides = [
   // 20 – MATRIX SYMBOLISM (JAZ)
   { section:'The Matrix', person:'Person 2 — JAZ', type:'default',
     html:`
-    <div class="section-badge">Symbolism · Slide 20</div>
+    <div class="section-badge">Symbolism · Slide 21</div>
     <div class="slide-title">The Pill Choice</div>
     <div class="divider"></div>
     <div class="pill-row">
@@ -942,7 +1126,7 @@ const slides = [
   // 21 – COMPARE INTRO
   { section:'Comparing the Two', person:'Person 3', type:'intro',
     html:`
-    <div class="section-badge">Comparison · Slide 21</div>
+    <div class="section-badge">Comparison · Slide 22</div>
     <div class="slide-title"><span class="glitch" data-text="COMPARING THE TWO">COMPARING THE TWO</span></div>
     <div class="divider"></div>
     <div class="body-text">
@@ -956,7 +1140,7 @@ const slides = [
   // 22 – THEME COMPARE (Person 1)
   { section:'Comparing the Two', person:'Person 1', type:'compare',
     html:`
-    <div class="section-badge">Theme Comparison · Slide 22</div>
+    <div class="section-badge">Theme Comparison · Slide 23</div>
     <div class="slide-title">Theme</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -976,7 +1160,7 @@ const slides = [
   // 23 – CHARACTER COMPARE (JAZ)
   { section:'Comparing the Two', person:'Person 2 — JAZ', type:'compare',
     html:`
-    <div class="section-badge">Character Comparison · Slide 23</div>
+    <div class="section-badge">Character Comparison · Slide 24</div>
     <div class="slide-title">The Narrator vs. Neo</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -1002,7 +1186,7 @@ const slides = [
   // 24 – TECHNOLOGY COMPARE (JAZ)
   { section:'Comparing the Two', person:'Person 2 — JAZ', type:'compare',
     html:`
-    <div class="section-badge">Technology Comparison · Slide 24</div>
+    <div class="section-badge">Technology Comparison · Slide 25</div>
     <div class="slide-title">Technology: Both Replace Reality</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -1022,7 +1206,7 @@ const slides = [
   // 25 – SYMBOLISM COMPARE
   { section:'Comparing the Two', person:'Person 3', type:'compare',
     html:`
-    <div class="section-badge">Symbolism Comparison · Slide 25</div>
+    <div class="section-badge">Symbolism Comparison · Slide 26</div>
     <div class="slide-title">Symbolism</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -1036,7 +1220,7 @@ const slides = [
   // 26 – OVERALL COMPARE (Person 1)
   { section:'Comparing the Two', person:'Person 1', type:'compare',
     html:`
-    <div class="section-badge">Overall Comparison · Slide 26</div>
+    <div class="section-badge">Overall Comparison · Slide 27</div>
     <div class="slide-title">Overall Comparison</div>
     <div class="divider"></div>
     <div class="compare-grid">
@@ -1057,7 +1241,7 @@ const slides = [
   // 27 – CONCLUSION (Person 1)
   { section:'Conclusion', person:'Person 1', type:'quote',
     html:`
-    <div class="section-badge">Conclusion · Slide 27</div>
+    <div class="section-badge">Conclusion · Slide 28</div>
     <div class="slide-title">Conclusion</div>
     <div class="divider"></div>
     <div class="big-quote">
@@ -1076,7 +1260,7 @@ const slides = [
   // 28 – Q&A (JAZ)
   { section:'Conclusion', person:'Person 2 — JAZ', type:'qa',
     html:`
-    <div class="section-badge">Discussion · Slide 28</div>
+    <div class="section-badge">Discussion · Slide 29</div>
     <div class="slide-title">Questions & Discussion</div>
     <div class="divider"></div>
     <div class="qa-grid">
@@ -1090,7 +1274,7 @@ const slides = [
   // 29 – THANK YOU (Person 3)
   { section:'Conclusion', person:'Person 3', type:'ty',
     html:`
-    <div class="section-badge">Thank You · Slide 29</div>
+    <div class="section-badge">Thank You · Slide 30</div>
     <div class="ty-glyph">ありがとう</div>
     <div class="slide-title" style="margin-top:16px;font-size:clamp(16px,2.5vw,24px)">Thank You</div>
     <div class="divider"></div>
@@ -1109,15 +1293,19 @@ const slides = [
 
 // ── RENDER ENGINE ──
 let current = 0;
+let isTransitioning = false;
 const area = document.getElementById('slide-area');
 
 function buildSlides() {
   slides.forEach((s, i) => {
     const div = document.createElement('div');
-    div.className = 'slide' + (i === 0 ? ' active' : '');
+    const classes = ['slide'];
+    if (s.type === 'bg-grid') classes.push('bg-grid-slide');
+    if (s.type === 'intro' || s.type === 'ty') classes.push('section-intro');
+    if (s.type === 'terminal') classes.push('slide-terminal');
+    div.dataset.baseClass = classes.join(' ');
+    div.className = div.dataset.baseClass + (i === 0 ? ' active' : '');
     div.id = 'slide-' + i;
-    if (s.type === 'bg-grid') div.classList.add('bg-grid-slide');
-    if (s.type === 'intro' || s.type === 'ty') div.classList.add('section-intro');
     div.innerHTML = `<div class="person-label">${s.person}</div>${s.html}`;
     area.appendChild(div);
   });
@@ -1146,23 +1334,28 @@ function updateUI() {
 }
 
 function goTo(n, dir) {
-  if (n === current || n < 0 || n >= slides.length) return;
+  if (isTransitioning || n === current || n < 0 || n >= slides.length) return;
   const oldEl = document.getElementById('slide-' + current);
   const newEl = document.getElementById('slide-' + n);
   const d = dir !== undefined ? dir : (n > current ? 1 : -1);
+  const exitClass = d > 0 ? 'exit-right' : 'exit-left';
+  const enterClass = d > 0 ? 'enter-right' : 'enter-left';
 
-  oldEl.classList.remove('active');
-  oldEl.className = 'slide ' + (d > 0 ? 'exit-right' : 'exit-left');
-  setTimeout(() => { oldEl.className = 'slide'; }, 450);
-
-  newEl.className = 'slide ' + (d > 0 ? 'enter-right' : 'enter-left');
-  setTimeout(() => {
-    newEl.classList.remove('enter-right', 'enter-left');
-    newEl.classList.add('active');
-  }, 20);
+  isTransitioning = true;
+  oldEl.className = `${oldEl.dataset.baseClass} active ${exitClass}`;
 
   current = n;
   updateUI();
+
+  setTimeout(() => {
+    oldEl.className = oldEl.dataset.baseClass;
+    newEl.className = `${newEl.dataset.baseClass} active ${enterClass}`;
+
+    setTimeout(() => {
+      newEl.className = `${newEl.dataset.baseClass} active`;
+      isTransitioning = false;
+    }, 340);
+  }, 190);
 }
 
 function go(d) { goTo(current + d, d); }
@@ -1176,6 +1369,7 @@ document.addEventListener('keydown', e => {
 // ── INIT ──
 buildSlides();
 updateUI();
+setupRainTransition();
 </script>
 </body>
 </html>
