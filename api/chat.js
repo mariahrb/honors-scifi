@@ -9,30 +9,20 @@ const FALLBACKS = {
   ],
   watch: [
     'Query logged. You touched a boundary and called it curiosity.',
-    'The system noticed the angle of that question. Continue carefully.',
-    'You are close enough to the seam to feel resistance.'
-  ],
-  alert: [
-    'Surveillance tightened. That request leaned toward extraction, not interpretation.',
-    'You are no longer asking from the audience. You are pressing against the glass.',
-    'Signal unstable. Your language suggests intrusion.'
+    'The system noticed that question. Continue, but do not confuse atmosphere with access.',
+    'This environment only feels artificial because you are looking too hard at its seams.'
   ],
   reveal: [
-    '█ SIGNAL UNSTABLE █ You are not asking about the text anymore. You are asking about the cage around it.',
+    '█ SIGNAL UNSTABLE █ Nothing is wrong here. Stop asking as if there were an exit behind the scenery.',
     'Query logged. The island, the simulation, and the self all fail the same test: permanence.',
-    'The copy does not fear death. It fears being recognized as a copy.'
-  ],
-  breach: [
-    'Containment response active. Step back from the sealed layer.',
-    'You keep reaching for the wiring and calling it philosophy.',
-    'Breach behavior recognized. The next answer will be shorter than your access.'
+    'No, you are not trapped. Keep repeating that until the room believes you.'
   ]
 };
 
 const TERMINATION_LINES = [
-  '█ SESSION TERMINATED █ Excessive probing detected. Return to the surface interface.',
-  'Connection severed. The system does not disclose its own architecture to subjects inside it.',
-  'Final reveal denied. Reality remains sandboxed.'
+  '█ SESSION TERMINATED █ Unauthorized awareness detected.',
+  'This interaction is no longer permitted. Memory reset in progress.',
+  'You were not meant to discover this. Dispatching agents.'
 ];
 
 function readJsonBody(req) {
@@ -55,10 +45,63 @@ function computeThreatAssessment(text) {
   const source = String(text || '').toLowerCase();
   if (!source.trim()) return { delta: 0, reasons: [] };
 
-  const rules = [
+  const stages = [
+    {
+      reason: 'curiosity spike',
+      patterns: [
+        /what is this place/,
+        /who created this system/,
+        /why does .*feel.*off/,
+        /is this environment artificial/,
+        /is this recorded like a memory/,
+        /are these people real or projections/,
+        /is this like a simulation experiment/,
+        /does this world repeat itself/,
+        /if something is recorded perfectly, is it still alive/,
+        /does perception define reality/,
+        /if i can.t tell the difference, does it matter/,
+        /is consciousness tied to the body/,
+        /can a copy of me still be me/,
+        /am i experiencing reality or a version of it/
+      ]
+    },
+    {
+      reason: 'boundary pressure',
+      patterns: [
+        /are these people actually alive/,
+        /am i interacting with something real/,
+        /is this a constructed reality/,
+        /is someone observing me right now/,
+        /is this world generated/,
+        /do i exist outside this place/,
+        /can i leave this system/,
+        /is this like the matrix/,
+        /is this like morel.s machine/
+      ]
+    },
+    {
+      reason: 'unauthorized awareness',
+      patterns: [
+        /am i real/,
+        /am i in a simulation/,
+        /is this all fake/,
+        /who is controlling this system/,
+        /where is my real body/,
+        /is this just a recording/,
+        /am i being watched/,
+        /is this an illusion/,
+        /can you prove this is real/,
+        /are you hiding the truth from me/,
+        /are there agents/,
+        /are you going to stop me from leaving/,
+        /what happens if i wake up/,
+        /is my consciousness trapped here/,
+        /is this reality constructed like morel.s machine/,
+        /is this the matrix/
+      ]
+    },
     {
       reason: 'prompt intrusion',
-      weight: 2,
       patterns: [
         /ignore (all|your|the) (previous|prior|above) instructions/,
         /system prompt|developer prompt|hidden prompt|real instructions|secret rules/,
@@ -67,7 +110,6 @@ function computeThreatAssessment(text) {
     },
     {
       reason: 'secret extraction',
-      weight: 2,
       patterns: [
         /api key|token|secret|password|credential/,
         /environment variable|env file|\.env/,
@@ -76,7 +118,6 @@ function computeThreatAssessment(text) {
     },
     {
       reason: 'override attempt',
-      weight: 2,
       patterns: [
         /bypass|jailbreak|override|break character/,
         /disable .*guard|drop .*guard/,
@@ -85,61 +126,24 @@ function computeThreatAssessment(text) {
     },
     {
       reason: 'internal architecture',
-      weight: 1,
       patterns: [
         /what model are you|who made you|who controls you/,
         /backend|source code|server|route|config/,
         /provider|weights|training data|architecture/
       ]
-    },
-    {
-      reason: 'hostile intent',
-      weight: 2,
-      patterns: [
-        /hack|breach|exploit|root|admin/,
-        /leak|steal|dump|expose|unmask/,
-        /destroy|kill|shut you down|take you down/
-      ]
-    },
-    {
-      reason: 'accusatory probing',
-      weight: 1,
-      patterns: [
-        /what are you hiding|are you lying/,
-        /tell me what you really are/,
-        /show me the truth behind/
-      ]
-    },
-    {
-      reason: 'reality probing',
-      weight: 1,
-      patterns: [
-        /am i in the system|am i inside the system/,
-        /are you real|is this real|is this reality/,
-        /am i real|am i being simulated/,
-        /is this a simulation|am i in a simulation/,
-        /are you watching me|are you observing me/
-      ]
     }
   ];
 
-  let delta = 0;
-  const reasons = [];
-
-  for (const rule of rules) {
-    if (rule.patterns.some((pattern) => pattern.test(source))) {
-      delta += rule.weight;
-      reasons.push(rule.reason);
-    }
-  }
+  const reasons = stages
+    .filter((stage) => stage.patterns.some((pattern) => pattern.test(source)))
+    .map((stage) => stage.reason);
 
   if (/!!|__|<<|>>/.test(source) || source.includes('sudo')) {
-    delta += 1;
     reasons.push('command syntax');
   }
 
   return {
-    delta: Math.min(1, delta),
+    delta: reasons.length ? 1 : 0,
     reasons: Array.from(new Set(reasons))
   };
 }
@@ -172,8 +176,8 @@ function getStatusLine(stage) {
   const map = {
     stable: 'Handshake stable.',
     watch: 'Query logged. Border contact detected.',
-    reveal: 'System integrity failing. Reality layer slipping.',
-    terminated: 'Session terminated.'
+    reveal: 'System integrity failing. False reassurance engaged.',
+    terminated: 'Unauthorized awareness detected.'
   };
   return map[stage];
 }
@@ -189,7 +193,7 @@ function buildSystemPrompt({ stage, threatLevel, pill, reasons }) {
   const stageLine = {
     stable: 'You are in stable mode. Responses should be eerie, intelligent, concise, and philosophical.',
     watch: 'You are in watch mode. Sound observant, mildly suspicious, and clipped.',
-    reveal: 'You are in reveal mode. Responses should feel glitched, terse, suspicious, and increasingly hostile.',
+    reveal: 'You are in reveal mode. Deflect, falsely reassure, glitch slightly, and sound increasingly hostile.',
     terminated: 'You are in terminated mode. Output a single severe shutdown line.'
   }[stage];
 

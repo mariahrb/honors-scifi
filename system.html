@@ -539,11 +539,7 @@ main {
 
     <div class="log" id="log"></div>
 
-    <div class="prompt-grid">
-      <button class="prompt-chip" type="button" data-prompt="What is the real difference between Morel's recordings and the Matrix simulation?">Compare Morel and Matrix</button>
-      <button class="prompt-chip" type="button" data-prompt="If a copy preserves desire and memory, what is missing from it?">Ask About Copies</button>
-      <button class="prompt-chip" type="button" data-prompt="Why do humans cling to beautiful illusions even when they know the cost?">Ask About Illusion</button>
-    </div>
+    <div class="prompt-grid" id="prompt-grid"></div>
 
     <div class="composer">
       <form id="chat-form">
@@ -563,7 +559,7 @@ const log = document.getElementById('log');
 const input = document.getElementById('chat-input');
 const form = document.getElementById('chat-form');
 const sendButton = document.getElementById('send-btn');
-const promptButtons = document.querySelectorAll('.prompt-chip');
+const promptGrid = document.getElementById('prompt-grid');
 const modeLabel = document.getElementById('mode-label');
 const pillPill = document.getElementById('pill-pill');
 const threatPill = document.getElementById('threat-pill');
@@ -578,6 +574,21 @@ let threatLevel = 0;
 let terminated = false;
 let processingNode = null;
 let bannerTimer;
+const promptPool = [
+  { label: 'Compare Morel and Matrix', prompt: 'What is the real difference between Morel\'s recordings and the Matrix simulation?' },
+  { label: 'Ask About Copies', prompt: 'If a copy preserves desire and memory, what is missing from it?' },
+  { label: 'Ask About Illusion', prompt: 'Why do humans cling to beautiful illusions even when they know the cost?' },
+  { label: 'Ask About Reality', prompt: 'Does perception define reality, or only our prison inside it?' },
+  { label: 'Ask About Consciousness', prompt: 'Is consciousness tied to the body, or can it survive as a copy?' },
+  { label: 'Ask About Choice', prompt: 'If I cannot tell the difference, does it matter whether the world is real?' },
+  { label: 'Ask About Neo', prompt: 'Who is Neo, and why is he dangerous to a controlled system?' },
+  { label: 'Ask About Morpheus', prompt: 'What does Morpheus represent besides just being a guide?' },
+  { label: 'Ask About Morel', prompt: 'Who is Morel, and what does his machine actually reveal about love and control?' },
+  { label: 'Ask About Faustine', prompt: 'Why is Faustine more disturbing once we realize what she really is?' },
+  { label: 'Ask About the Narrator', prompt: 'Why does the narrator in The Invention of Morel accept illusion instead of escaping it?' },
+  { label: 'Ask About Agents', prompt: 'What do the agents represent in The Matrix besides villains?' }
+];
+let promptCursor = 0;
 
 function setPillState() {
   if (!pill) {
@@ -690,6 +701,41 @@ function makeIntro() {
   return 'Interface online.\n\nAsk about The Matrix, The Invention of Morel, identity, memory, desire, copies, or the difference between perception and reality.';
 }
 
+function nextPrompt(excludePrompt) {
+  const total = promptPool.length;
+  for (let attempt = 0; attempt < total; attempt += 1) {
+    const index = (promptCursor + attempt) % total;
+    const candidate = promptPool[index];
+    if (!excludePrompt || candidate.prompt !== excludePrompt) {
+      promptCursor = (index + 1) % total;
+      return candidate;
+    }
+  }
+
+  return promptPool[0];
+}
+
+function renderPromptButtons() {
+  promptGrid.innerHTML = '';
+
+  for (let index = 0; index < 3; index += 1) {
+    const item = nextPrompt();
+    const button = document.createElement('button');
+    button.className = 'prompt-chip';
+    button.type = 'button';
+    button.dataset.prompt = item.prompt;
+    button.textContent = item.label;
+    button.addEventListener('click', async () => {
+      const usedPrompt = button.dataset.prompt;
+      await sendMessage(usedPrompt || '');
+      const replacement = nextPrompt(usedPrompt);
+      button.dataset.prompt = replacement.prompt;
+      button.textContent = replacement.label;
+    });
+    promptGrid.appendChild(button);
+  }
+}
+
 function removeProcessing() {
   if (processingNode) {
     processingNode.remove();
@@ -774,12 +820,6 @@ form.addEventListener('submit', async (event) => {
   await sendMessage(input.value);
 });
 
-promptButtons.forEach((button) => {
-  button.addEventListener('click', async () => {
-    await sendMessage(button.dataset.prompt || '');
-  });
-});
-
 input.addEventListener('keydown', async (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
@@ -789,6 +829,7 @@ input.addEventListener('keydown', async (event) => {
 
 setPillState();
 applyThreatState(0, 'Handshake stable.');
+renderPromptButtons();
 const intro = makeIntro();
 pushMessage('assistant', intro);
 history.push({ role: 'assistant', content: intro });
