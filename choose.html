@@ -350,6 +350,11 @@ body::after {
       <p class="quote">
         "You take the red pill - you stay in Wonderland, and I show you how deep the rabbit hole goes."
       </p>
+
+      <div class="action-row" style="margin-top: 24px;">
+        <a class="action-btn" href="/system">Enter System Interface</a>
+        <a class="action-btn" href="/">Back to Presentation</a>
+      </div>
     </div>
 
     <div id="face-container" class="face-container">
@@ -448,6 +453,7 @@ body::after {
 
       <div class="action-row">
         <button class="action-btn" type="button" onclick="resetPill()">Choose Again</button>
+        <a class="action-btn" id="system-entry" href="/system">Enter System Interface</a>
         <a class="action-btn" href="/">Back to Presentation</a>
       </div>
     </div>
@@ -492,6 +498,7 @@ function choosePill(color) {
   clearInterval(typingTimer);
   choiceScene.style.display = 'none';
   faceContainer.style.display = 'flex';
+  document.getElementById('system-entry').href = `/system?pill=${color}`;
 
   if (color === 'blue') {
     faceSvg.style.filter = 'drop-shadow(0 0 20px rgba(0,100,255,.8)) hue-rotate(160deg)';

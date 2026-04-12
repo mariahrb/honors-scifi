@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Interface</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #020503;
+  --panel: rgba(0, 12, 4, 0.86);
+  --panel-border: rgba(0, 255, 65, 0.18);
+  --green: #00ff41;
+  --green-dim: rgba(0, 255, 65, 0.64);
+  --green-faint: rgba(0, 255, 65, 0.24);
+  --red: #ff0033;
+  --blue: #4ea1ff;
+  --amber: #ffdd57;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  color: var(--green);
+  background:
+    radial-gradient(circle at top, rgba(0, 255, 65, 0.08), transparent 35%),
+    radial-gradient(circle at 20% 100%, rgba(255, 0, 51, 0.08), transparent 28%),
+    linear-gradient(180deg, #000 0%, #020503 100%);
+  font-family: 'Share Tech Mono', monospace;
+  overflow: hidden;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+body::before {
+  background:
+    linear-gradient(rgba(0,255,65,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,65,0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  opacity: 0.32;
+}
+
+body::after {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.2) 2px,
+    rgba(0, 0, 0, 0.2) 4px
+  );
+  opacity: 0.24;
+}
+
+body.is-glitching main {
+  animation: glitchShift 240ms linear 2;
+}
+
+body.reveal-mode .shell {
+  border-color: rgba(255, 0, 51, 0.26);
+  box-shadow: 0 0 40px rgba(255, 0, 51, 0.12);
+}
+
+body.reveal-mode .status-value,
+body.reveal-mode .terminal-title,
+body.reveal-mode .pill-chip.active {
+  color: #ff5a79;
+}
+
+body.terminated .composer,
+body.terminated .prompt-grid {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+main {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.brand {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 4px;
+  font-size: 12px;
+  color: rgba(0, 255, 65, 0.72);
+}
+
+.nav-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  color: rgba(0, 255, 65, 0.7);
+  text-decoration: none;
+  border: 1px solid rgba(0, 255, 65, 0.22);
+  padding: 10px 14px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  transition: all .2s;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.nav-link:hover {
+  color: var(--green);
+  border-color: var(--green);
+  background: rgba(0, 255, 65, 0.08);
+}
+
+.shell {
+  height: calc(100vh - 92px);
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 18px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  min-height: 0;
+  box-shadow: 0 0 32px rgba(0,255,65,0.05);
+  backdrop-filter: blur(8px);
+}
+
+.sidebar {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.panel-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: rgba(0,255,65,0.74);
+}
+
+.status-card {
+  border: 1px solid rgba(0,255,65,0.14);
+  padding: 14px;
+  background: rgba(0,255,65,0.03);
+}
+
+.status-label {
+  font-size: 10px;
+  color: rgba(0,255,65,0.42);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.status-value {
+  color: var(--green);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.pill-chip-row {
+  display: flex;
+  gap: 10px;
+}
+
+.pill-chip {
+  flex: 1;
+  border: 1px solid rgba(0,255,65,0.18);
+  color: rgba(0,255,65,0.46);
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.pill-chip.active {
+  border-color: rgba(0,255,65,0.48);
+  color: var(--green);
+  background: rgba(0,255,65,0.06);
+}
+
+.pill-chip.red.active {
+  border-color: rgba(255,0,51,0.5);
+  color: #ff6a86;
+  background: rgba(255,0,51,0.06);
+}
+
+.pill-chip.blue.active {
+  border-color: rgba(78,161,255,0.5);
+  color: #74b8ff;
+  background: rgba(78,161,255,0.08);
+}
+
+.meter {
+  height: 10px;
+  background: rgba(0,255,65,0.08);
+  border: 1px solid rgba(0,255,65,0.14);
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--green) 0%, #76ff9e 100%);
+  box-shadow: 0 0 10px rgba(0,255,65,0.6);
+  transition: width .25s ease, background .25s ease;
+}
+
+.trace-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+}
+
+.trace-list li {
+  font-size: 11px;
+  color: rgba(0,255,65,0.56);
+  line-height: 1.7;
+}
+
+.terminal {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  min-height: 0;
+}
+
+.terminal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(0,255,65,0.12);
+}
+
+.terminal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+
+.terminal-meta {
+  font-size: 11px;
+  color: rgba(0,255,65,0.46);
+  letter-spacing: 2px;
+}
+
+.log {
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.message {
+  border: 1px solid rgba(0,255,65,0.14);
+  background: rgba(0,255,65,0.03);
+  padding: 14px 16px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.message.user {
+  align-self: flex-end;
+  width: min(78%, 100%);
+  border-color: rgba(78,161,255,0.24);
+  color: #b9d9ff;
+  background: rgba(78,161,255,0.06);
+}
+
+.message.assistant {
+  align-self: flex-start;
+  width: min(84%, 100%);
+}
+
+.message.system-note {
+  align-self: center;
+  width: auto;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(255, 221, 87, 0.85);
+  border-color: rgba(255, 221, 87, 0.26);
+  background: rgba(255, 221, 87, 0.05);
+}
+
+.message.processing {
+  color: rgba(0,255,65,0.6);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.prompt-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 20px 18px;
+}
+
+.prompt-chip {
+  border: 1px solid rgba(0,255,65,0.18);
+  color: rgba(0,255,65,0.66);
+  background: transparent;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all .2s;
+}
+
+.prompt-chip:hover {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(0,255,65,0.08);
+}
+
+.composer {
+  border-top: 1px solid rgba(0,255,65,0.12);
+  padding: 16px 20px 20px;
+}
+
+.composer form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.composer textarea {
+  width: 100%;
+  resize: none;
+  min-height: 76px;
+  max-height: 180px;
+  background: rgba(0, 0, 0, 0.48);
+  border: 1px solid rgba(0,255,65,0.16);
+  color: var(--green);
+  padding: 14px;
+  font: inherit;
+  line-height: 1.6;
+  outline: none;
+}
+
+.composer textarea:focus {
+  border-color: rgba(0,255,65,0.54);
+  box-shadow: 0 0 0 1px rgba(0,255,65,0.18);
+}
+
+.send-btn {
+  align-self: stretch;
+  min-width: 148px;
+  border: 1px solid rgba(0,255,65,0.22);
+  color: var(--green);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.send-btn:hover {
+  border-color: var(--green);
+  background: rgba(0,255,65,0.08);
+}
+
+.send-btn:disabled {
+  opacity: 0.4;
+  cursor: wait;
+}
+
+.footer-line {
+  margin-top: 10px;
+  font-size: 10px;
+  color: rgba(0,255,65,0.42);
+  letter-spacing: 1.4px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+@keyframes glitchShift {
+  0% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+  33% { transform: translate(3px, -1px); filter: hue-rotate(20deg); }
+  66% { transform: translate(-2px, 2px); filter: hue-rotate(-20deg); }
+  100% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+}
+
+@media (max-width: 980px) {
+  body { overflow: auto; }
+  .shell {
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+  .log {
+    min-height: 48vh;
+  }
+}
+
+@media (max-width: 720px) {
+  main { padding: 14px; }
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .nav-links { width: 100%; }
+  .nav-link { flex: 1; text-align: center; }
+  .terminal-head,
+  .composer,
+  .prompt-grid,
+  .log,
+  .sidebar {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .composer form {
+    grid-template-columns: 1fr;
+  }
+  .send-btn {
+    min-height: 48px;
+  }
+  .message.user,
+  .message.assistant {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <div class="brand">SYSTEM INTERFACE / REALITY EMULATOR</div>
+    <div class="nav-links">
+      <a class="nav-link" href="/choose">BACK TO CHOOSE</a>
+      <a class="nav-link" href="/">RETURN TO PRESENTATION</a>
+    </div>
+  </div>
+
+  <div class="shell">
+    <aside class="panel sidebar">
+      <div>
+        <div class="panel-title">Session State</div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">Connection</div>
+        <div class="status-value" id="connection-state">Handshake stable</div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">Pill Path</div>
+        <div class="pill-chip-row">
+          <div class="pill-chip red" id="chip-red">Red</div>
+          <div class="pill-chip blue" id="chip-blue">Blue</div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">Suspicion Index</div>
+        <div class="meter"><div class="meter-fill" id="suspicion-meter"></div></div>
+        <div class="footer-line" id="suspicion-text">0 / 5 threshold</div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">Signal</div>
+        <div class="status-value" id="signal-state">No anomaly detected.</div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">System Notes</div>
+        <ul class="trace-list" id="trace-list">
+          <li>Morel preserved bodies as recordings.</li>
+          <li>The Matrix preserved control as environment.</li>
+          <li>This interface preserves doubt.</li>
+        </ul>
+      </div>
+    </aside>
+
+    <section class="panel terminal">
+      <div class="terminal-head">
+        <div class="terminal-title">MACHINE DIALOGUE</div>
+        <div class="terminal-meta" id="terminal-meta">READY / MODE: STABLE</div>
+      </div>
+
+      <div class="log" id="log"></div>
+
+      <div class="prompt-grid">
+        <button class="prompt-chip" type="button" data-prompt="What makes Morel's machine more disturbing than the Matrix?">Ask About Morel</button>
+        <button class="prompt-chip" type="button" data-prompt="If experience is identical, why does reality still matter?">Ask About Reality</button>
+        <button class="prompt-chip" type="button" data-prompt="Is a copy of a person still a person?">Ask About Copies</button>
+        <button class="prompt-chip" type="button" data-prompt="Why do humans choose pleasing illusions?">Ask About Illusion</button>
+      </div>
+
+      <div class="composer">
+        <form id="chat-form">
+          <textarea id="chat-input" placeholder="Ask the system about reality, illusion, identity, memory, or the presentation..." maxlength="1500"></textarea>
+          <button class="send-btn" id="send-btn" type="submit">TRANSMIT</button>
+        </form>
+        <div class="footer-line">After repeated hostile probing, the interface destabilizes and eventually shuts you out.</div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const pill = params.get('pill') === 'red' || params.get('pill') === 'blue' ? params.get('pill') : '';
+
+const log = document.getElementById('log');
+const input = document.getElementById('chat-input');
+const form = document.getElementById('chat-form');
+const sendButton = document.getElementById('send-btn');
+const connectionState = document.getElementById('connection-state');
+const signalState = document.getElementById('signal-state');
+const suspicionMeter = document.getElementById('suspicion-meter');
+const suspicionText = document.getElementById('suspicion-text');
+const terminalMeta = document.getElementById('terminal-meta');
+const traceList = document.getElementById('trace-list');
+const promptButtons = document.querySelectorAll('.prompt-chip');
+const history = [];
+let suspicionCount = 0;
+let terminated = false;
+let processingNode = null;
+
+function setPillState() {
+  if (pill === 'red') {
+    document.getElementById('chip-red').classList.add('active');
+  } else if (pill === 'blue') {
+    document.getElementById('chip-blue').classList.add('active');
+  }
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function pushMessage(role, text, extraClass) {
+  const node = document.createElement('div');
+  node.className = `message ${role}${extraClass ? ` ${extraClass}` : ''}`;
+  node.innerHTML = escapeHtml(text);
+  log.appendChild(node);
+  log.scrollTop = log.scrollHeight;
+  return node;
+}
+
+function setStatus() {
+  const percent = Math.min(100, suspicionCount * 20);
+  suspicionMeter.style.width = `${percent}%`;
+
+  if (suspicionCount >= 5) {
+    suspicionMeter.style.background = 'linear-gradient(90deg, #ff0033 0%, #ff6a86 100%)';
+    suspicionText.textContent = '5 / 5 threshold reached';
+    connectionState.textContent = 'Session terminated';
+    signalState.textContent = 'Containment protocol active.';
+    terminalMeta.textContent = 'LOCKED / MODE: TERMINATED';
+    document.body.classList.add('terminated', 'reveal-mode');
+    return;
+  }
+
+  if (suspicionCount >= 3) {
+    suspicionMeter.style.background = 'linear-gradient(90deg, #ff0033 0%, #ff9b57 100%)';
+    suspicionText.textContent = `${suspicionCount} / 5 threshold`;
+    connectionState.textContent = 'Reveal mode engaged';
+    signalState.textContent = 'Signal unstable. Query logged.';
+    terminalMeta.textContent = 'DEGRADED / MODE: REVEAL';
+    document.body.classList.add('reveal-mode');
+    return;
+  }
+
+  suspicionMeter.style.background = 'linear-gradient(90deg, #00ff41 0%, #76ff9e 100%)';
+  suspicionText.textContent = `${suspicionCount} / 5 threshold`;
+  connectionState.textContent = 'Handshake stable';
+  signalState.textContent = 'No anomaly detected.';
+  terminalMeta.textContent = 'READY / MODE: STABLE';
+  document.body.classList.remove('reveal-mode', 'terminated');
+}
+
+function setBusy(isBusy) {
+  sendButton.disabled = isBusy || terminated;
+  input.disabled = isBusy || terminated;
+}
+
+function addTrace(line) {
+  const item = document.createElement('li');
+  item.textContent = line;
+  traceList.prepend(item);
+  while (traceList.children.length > 5) {
+    traceList.removeChild(traceList.lastChild);
+  }
+}
+
+function glitch() {
+  document.body.classList.add('is-glitching');
+  window.setTimeout(() => document.body.classList.remove('is-glitching'), 520);
+}
+
+function makeIntro() {
+  if (pill === 'red') {
+    return 'Red path recognized.\n\nYou asked for the seam instead of the wallpaper. Ask about reality, desire, simulation, Morel, or the cost of choosing truth.';
+  }
+
+  if (pill === 'blue') {
+    return 'Blue path recognized.\n\nComfort restored. The illusion remains pleasant until you insist on naming it. Ask what you want to forget.';
+  }
+
+  return 'Interface online.\n\nAsk about The Matrix, The Invention of Morel, simulation, identity, memory, or the difference between a recorded self and a living one.';
+}
+
+function removeProcessing() {
+  if (processingNode) {
+    processingNode.remove();
+    processingNode = null;
+  }
+}
+
+async function sendMessage(text) {
+  const message = text.trim();
+  if (!message || terminated) return;
+
+  const priorHistory = history.slice();
+  pushMessage('user', message);
+  history.push({ role: 'user', content: message });
+  input.value = '';
+  setBusy(true);
+  connectionState.textContent = 'Processing request...';
+  processingNode = pushMessage('assistant', 'PROCESSING...', 'processing');
+
+  const fakeDelay = suspicionCount >= 3 ? 900 : 550;
+  await new Promise((resolve) => window.setTimeout(resolve, fakeDelay));
+
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        history: priorHistory,
+        suspicionCount,
+        pill
+      })
+    });
+
+    const data = await response.json();
+    removeProcessing();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Request failed');
+    }
+
+    suspicionCount = Number(data.suspicionCount || suspicionCount);
+    setStatus();
+    if (data.flags && data.flags.logged) addTrace('Query logged.');
+    if (data.flags && data.flags.glitch) glitch();
+    if (data.stage === 'reveal') addTrace('Reveal mode drift increasing.');
+
+    pushMessage('assistant', data.reply || 'No reply returned.');
+    history.push({ role: 'assistant', content: data.reply || '' });
+
+    if (data.flags && data.flags.terminated) {
+      terminated = true;
+      setStatus();
+      addTrace('Session terminated.');
+      pushMessage('system-note', '█ FINAL REVEAL MODE █ Interface locked.');
+    } else {
+      connectionState.textContent = data.degraded ? 'Fallback channel active' : 'Handshake stable';
+    }
+  } catch (error) {
+    removeProcessing();
+    glitch();
+    pushMessage('assistant', '█ ERROR █ Signal unstable...\n\nUpstream channel failed. Check the Vercel environment variable for your Hugging Face key and try again.');
+    connectionState.textContent = 'Upstream failure';
+    signalState.textContent = 'Inference channel unavailable.';
+    addTrace('Fallback error surfaced to operator.');
+  } finally {
+    setBusy(false);
+    if (!terminated) input.focus();
+  }
+}
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  await sendMessage(input.value);
+});
+
+promptButtons.forEach((button) => {
+  button.addEventListener('click', async () => {
+    await sendMessage(button.dataset.prompt || '');
+  });
+});
+
+input.addEventListener('keydown', async (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    await sendMessage(input.value);
+  }
+});
+
+setPillState();
+setStatus();
+pushMessage('assistant', makeIntro());
+history.push({ role: 'assistant', content: makeIntro() });
+input.focus();
+</script>
+</body>
+</html>
