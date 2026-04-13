@@ -619,21 +619,94 @@ body.is-page-transition #cursor{
 
 /* Responsive */
 @media(max-width:600px){
+  /* ── layout resets ── */
+  body{cursor:auto}
+  #cursor{display:none}
+  #quick-links{display:none}
+
+  /* ── topbar ── */
+  #topbar{padding:8px 14px}
+  #topbar .logo{font-size:8px;letter-spacing:1px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #topbar .slide-counter{min-width:46px;font-size:10px}
+
+  /* ── slide area: allow internal scroll ── */
+  #slide-area{overflow:hidden}
+  .slide{
+    justify-content:flex-start;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    padding:20px 16px 32px;
+    align-items:center;
+  }
+  /* centre short content on screens that have room */
+  .slide.active{display:flex}
+
+  /* ── nav ── */
+  #nav{padding:10px 12px}
+  .nav-btn{font-size:10px;padding:8px 12px;letter-spacing:1px}
+  #dots-wrap{width:clamp(100px,40vw,260px)}
+  #snav-label{font-size:7px;letter-spacing:1px}
+
+  /* ── typography ── */
+  #pres{font-size:13px}
+  .slide-title{font-size:clamp(16px,5vw,28px)}
+  .body-text{font-size:12px;word-break:break-word;overflow-wrap:anywhere;max-width:100%}
+  .section-badge{letter-spacing:2px;font-size:8px}
+
+  /* ── grids: single column ── */
   .compare-grid,.stats-grid,.qa-grid{grid-template-columns:1fr}
   .qr-panel{grid-template-columns:1fr;text-align:center}
   .qr-copy{text-align:center}
   .pill-choices{gap:30px}
-  #pres{font-size:13px}
-  #quick-links{left:12px;right:12px;bottom:72px;align-items:stretch}
-  .quick-link{min-width:0;width:100%}
-  #topbar .logo{font-size:8px;letter-spacing:1px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .nav-btn{font-size:10px;padding:8px 12px;letter-spacing:1px}
-  .slide{padding:20px 18px}
-  #snav-label{font-size:7px;letter-spacing:1px}
+
+  /* ── cboxes ── */
+  .cbox{padding:14px;word-break:break-word;overflow-wrap:anywhere}
+  .cbox p{font-size:11px}
+
+  /* ── terminal ── */
+  .terminal{width:100%;max-width:100%}
+  .terminal-body{padding:14px 16px;font-size:11px}
+
+  /* ── world / philosophy split: single column ── */
   .world-split{grid-template-columns:1fr!important}
   .world-sim{border-right:none!important;border-bottom:1px solid rgba(0,255,65,.1)}
   .philosophy-split{grid-template-columns:1fr!important}
   .phil-resist{border-left:none!important;border-top:1px solid rgba(255,0,51,.2)}
+
+  /* ── comparison table ── */
+  table{font-size:11px}
+  table td,table th{padding:7px 8px;word-break:break-word}
+
+  /* ── sym-list ── */
+  .sym-item{gap:12px}
+  .sym-glyph{font-size:26px;width:30px}
+  .sym-body p{font-size:11px}
+
+  /* ── video / image ── */
+  .video-frame{max-width:100%!important}
+  .video-frame iframe{width:100%}
+  .video-caption{font-size:10px}
+
+  /* ── flex media slides: stack vertically ── */
+  .media-stack{flex-direction:column!important;align-items:stretch!important}
+  .media-stack img{height:120px!important;width:auto!important;align-self:flex-start!important}
+
+  /* ── QR ── */
+  .qr-frame{max-width:160px;margin:0 auto}
+
+  /* ── pill row ── */
+  .pill-row{gap:8px}
+  .pill{font-size:11px;padding:8px 14px;letter-spacing:1px}
+
+  /* ── big quote ── */
+  .big-quote{font-size:clamp(16px,5vw,28px);padding-left:14px;border-left-width:2px}
+
+  /* ── stats ── */
+  .stat-num{font-size:22px}
+
+  /* ── thank you glyph ── */
+  .ty-glyph{font-size:clamp(50px,15vw,80px)}
 }
 </style>
 </head>
@@ -821,7 +894,7 @@ const slides = [
   { section:'Introduction', person:'Samarth', type:'quote',
     html:`
     <div class="section-badge">Opening Statement · Slide 03</div>
-    <div style="display:flex;gap:24px;align-items:center;width:100%;max-width:660px">
+    <div style="display:flex;gap:24px;align-items:center;width:100%;max-width:660px" class="media-stack">
       <img src="https://covers.openlibrary.org/b/isbn/9781590170908-L.jpg"
            alt="The Invention of Morel — book cover"
            style="height:150px;width:auto;flex-shrink:0;border:1px solid rgba(0,255,65,.3);box-shadow:0 0 24px rgba(0,255,65,.12)">
@@ -866,7 +939,7 @@ const slides = [
     <div class="section-badge">Author · Slide 05</div>
     <div class="slide-title">Adolfo Bioy Casares</div>
     <div class="divider"></div>
-    <div style="display:flex;gap:20px;align-items:flex-start;width:100%;max-width:680px">
+    <div style="display:flex;gap:20px;align-items:flex-start;width:100%;max-width:680px" class="media-stack">
       <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Adolfo_Bioy_Casares_by_Eduardo_Comesaña.jpg"
            alt="Adolfo Bioy Casares"
            style="height:180px;width:auto;flex-shrink:0;border:1px solid rgba(0,255,65,.3);box-shadow:0 0 20px rgba(0,255,65,.12)">
@@ -915,7 +988,7 @@ const slides = [
     <div class="section-badge">Plot · Slide 07</div>
     <div class="slide-title">Plot</div>
     <div class="divider"></div>
-    <div style="display:flex;gap:20px;align-items:flex-start;width:100%;max-width:820px">
+    <div style="display:flex;gap:20px;align-items:flex-start;width:100%;max-width:820px" class="media-stack">
       <div class="timeline" style="flex:1">
         <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>Arrival</h5><p>A fugitive escapes to a supposedly deserted island, seeking refuge from the law.</p></div></div>
         <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>Discovery</h5><p>He encounters a group of people — elegant, oblivious, repeating the same week endlessly.</p></div></div>
@@ -1064,7 +1137,7 @@ const slides = [
     <div class="section-badge">Directors · Slide 14</div>
     <div class="slide-title">The Wachowskis</div>
     <div class="divider"></div>
-    <div style="display:flex;gap:20px;align-items:flex-start;width:100%;max-width:680px">
+    <div style="display:flex;gap:20px;align-items:flex-start;width:100%;max-width:680px" class="media-stack">
       <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Lana_and_Lilly_Wachowski.jpg"
            alt="Lana and Lilly Wachowski"
            style="height:180px;width:auto;flex-shrink:0;border:1px solid rgba(0,255,65,.3);box-shadow:0 0 20px rgba(0,255,65,.12)">
@@ -1114,7 +1187,7 @@ const slides = [
     <div class="section-badge">Plot · Slide 16</div>
     <div class="slide-title">Plot</div>
     <div class="divider"></div>
-    <div style="display:flex;gap:24px;align-items:center;width:100%;max-width:760px">
+    <div style="display:flex;gap:24px;align-items:center;width:100%;max-width:760px" class="media-stack">
       <div class="timeline" style="flex:1">
         <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Programmer</h5><p>Thomas A. Anderson — "Neo" — a hacker who suspects something is fundamentally wrong with reality.</p></div></div>
         <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h5>The Contact</h5><p>Morpheus reaches Neo. The world he knows is not real — it is a simulation called the Matrix.</p></div></div>
