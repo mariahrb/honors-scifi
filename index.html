@@ -622,7 +622,23 @@ body.is-page-transition #cursor{
   /* ── layout resets ── */
   body{cursor:auto}
   #cursor{display:none}
-  #quick-links{display:none}
+
+  /* ── quick-links: compact strip just above nav ── */
+  #quick-links{
+    position:fixed;left:0;right:0;bottom:52px;
+    flex-direction:row;gap:0;align-items:stretch;
+    border-top:1px solid rgba(0,255,65,.12);
+    background:rgba(0,0,0,.92);
+    z-index:10;
+  }
+  .quick-link{
+    flex:1;min-width:0;width:auto;
+    font-size:9px;padding:9px 8px;letter-spacing:1px;
+    text-align:center;border:none;border-radius:0;
+    border-right:1px solid rgba(0,255,65,.12);
+  }
+  .quick-link:last-child{border-right:none}
+  #nav{padding-bottom:10px}
 
   /* ── topbar ── */
   #topbar{padding:8px 14px}
@@ -636,7 +652,7 @@ body.is-page-transition #cursor{
     overflow-y:auto;
     overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
-    padding:20px 16px 32px;
+    padding:20px 16px 96px;
     align-items:center;
   }
   /* centre short content on screens that have room */
