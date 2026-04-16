@@ -617,6 +617,44 @@ body.is-page-transition #cursor{
 /* AI Speech messages */
 .ai-msgs{display:none}
 
+/* ── PRINT / PDF ── */
+@media print {
+  @page { size: 1280px 720px; margin: 0; }
+
+  *{ -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important;
+     animation:none!important; transition:none!important; }
+
+  body{ overflow:visible!important; width:1280px!important; height:auto!important; cursor:auto!important; }
+
+  #topbar,#nav,#cursor,#rain-canvas,#scanlines,#glitch-overlay,
+  #quick-links,#pill-overlay,#page-transition{ display:none!important; }
+
+  #pres{ position:static!important; height:auto!important; display:block!important; }
+
+  #slide-area{
+    position:static!important; height:auto!important;
+    overflow:visible!important; background:none!important;
+  }
+
+  .slide{
+    position:relative!important;
+    display:flex!important;
+    opacity:1!important; visibility:visible!important;
+    transform:none!important; filter:none!important;
+    width:1280px!important; height:720px!important;
+    page-break-after:always!important; break-after:page!important;
+    overflow:hidden!important;
+    padding:40px 60px!important;
+    background:#000!important;
+    flex-shrink:0!important;
+  }
+
+  .person-label{ display:block!important; }
+
+  /* last slide: no trailing blank page */
+  .slide:last-child{ page-break-after:avoid!important; break-after:avoid!important; }
+}
+
 /* Responsive */
 @media(max-width:600px){
   /* ── layout resets ── */
